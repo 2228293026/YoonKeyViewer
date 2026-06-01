@@ -1,0 +1,35 @@
+# Build output
+bin/
+obj/
+*.dll
+*.pdb
+*.exe
+
+# Asset Bundles
+Assets/AssetBundles/
+*.bundle
+
+# Unity Library (auto-generated)
+Library/
+Logs/
+Temp/
+
+# Unity generated
+*.csproj.user
+*.unityproj
+*.sln.docstates
+*.userprefs
+
+# VS
+.vs/
+*.suo
+*.user
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Meta files
+*.meta
+!.gitignore
