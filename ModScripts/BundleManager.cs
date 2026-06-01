@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using static TransformGizmoHolder;
 using Object = UnityEngine.Object;
 
 namespace YoonKeyViewer
