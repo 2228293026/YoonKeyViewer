@@ -17,6 +17,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Size" },
                     { SystemLanguage.German, "Größe" },
                     { SystemLanguage.Korean, "크기" },
+                    { SystemLanguage.ChineseSimplified, "大小" }
                 }
             },
             {
@@ -25,6 +26,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "X Location" },
                     { SystemLanguage.German, "X-Position" },
                     { SystemLanguage.Korean, "X 위치" },
+                    { SystemLanguage.ChineseSimplified, "X 位置" }
                 }
             },
             {
@@ -33,6 +35,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Y Location" },
                     { SystemLanguage.German, "Y-Position" },
                     { SystemLanguage.Korean, "Y 위치" },
+                    { SystemLanguage.ChineseSimplified, "Y 位置" }
                 }
             },
             {
@@ -41,6 +44,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Yoon is nervous if current BPM exceeds" },
                     { SystemLanguage.German, "Yoon wird nervös, wenn dieses BPM übersteigt" },
                     { SystemLanguage.Korean, "굥욷이 힘들어하는 체감 BPM 값" },
+                    { SystemLanguage.ChineseSimplified, "当前 BPM 超过此值时 Yoon 会紧张" }
                 }
             },
             {
@@ -49,6 +53,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Flip Horizontal" },
                     { SystemLanguage.German, "Horizontal spiegeln" },
                     { SystemLanguage.Korean, "수평 반전" },
+                    { SystemLanguage.ChineseSimplified, "水平翻转" }
                 }
             },
             {
@@ -57,6 +62,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Hide Desk" },
                     { SystemLanguage.German, "Schreibtisch ausblenden" },
                     { SystemLanguage.Korean, "책상 숨기기" },
+                    { SystemLanguage.ChineseSimplified, "隐藏桌子" }
                 }
             },
             {
@@ -65,6 +71,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Press a key" },
                     { SystemLanguage.German, "Drücken Sie eine Taste" },
                     { SystemLanguage.Korean, "키를 누르세요" },
+                    { SystemLanguage.ChineseSimplified, "按一个键" }
                 }
             },
             {
@@ -73,6 +80,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Key Viewer Settings" },
                     { SystemLanguage.German, "Tastenanzeige-Einstellungen" },
                     { SystemLanguage.Korean, "키뷰어 설정" },
+                    { SystemLanguage.ChineseSimplified, "按键查看器设置" }
                 }
             },
             {
@@ -81,6 +89,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Hide Legs" },
                     { SystemLanguage.German, "Beine ausblenden" },
                     { SystemLanguage.Korean, "다리 숨기기" },
+                    { SystemLanguage.ChineseSimplified, "隐藏腿" }
                 }
             },
             {
@@ -89,6 +98,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Hide Feet Keyboard" },
                     { SystemLanguage.German, "Fußtastatur ausblenden" },
                     { SystemLanguage.Korean, "발 키보드 숨기기" },
+                    { SystemLanguage.ChineseSimplified, "隐藏脚用键盘" }
                 }
             },
             {
@@ -97,6 +107,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Top Row" },
                     { SystemLanguage.German, "Obere Reihe" },
                     { SystemLanguage.Korean, "상단 줄" },
+                    { SystemLanguage.ChineseSimplified, "上排" }
                 }
             },
             {
@@ -105,6 +116,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Bottom Row" },
                     { SystemLanguage.German, "Untere Reihe" },
                     { SystemLanguage.Korean, "하단 줄" },
+                    { SystemLanguage.ChineseSimplified, "下排" }
                 }
             },
             {
@@ -113,6 +125,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Feet Keyboard" },
                     { SystemLanguage.German, "Fußtastatur" },
                     { SystemLanguage.Korean, "발 키보드" },
+                    { SystemLanguage.ChineseSimplified, "脚用键盘" }
                 }
             },
             {
@@ -121,6 +134,7 @@ namespace YoonKeyViewer
                     { SystemLanguage.English, "Character" },
                     { SystemLanguage.German, "Charakter" },
                     { SystemLanguage.Korean, "캐릭터" },
+                    { SystemLanguage.ChineseSimplified, "角色" }
                 }
             }
         };
