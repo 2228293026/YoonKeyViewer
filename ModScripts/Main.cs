@@ -116,7 +116,8 @@ namespace YoonKeyViewer
                     YoonBundleManager.Instance = new YoonBundleManager();
                 GameObject go = UnityEngine.Object.Instantiate(YoonBundleManager.Instance.KeyViewerObject);
                 UnityEngine.Object.DontDestroyOnLoad(go);
-                KeyViewer = ViewerSetup.SetupYoon(go);
+                KeyViewer = go.GetComponent<scrYoonKeyViewer>();
+                //KeyViewer = ViewerSetup.SetupYoon(go);
                 if (setting.HideDesk) KeyViewer.Table.enable = 0;
             }
             else
@@ -125,7 +126,8 @@ namespace YoonKeyViewer
                     LineBundleManager.Instance = new LineBundleManager();
                 GameObject go = UnityEngine.Object.Instantiate(LineBundleManager.Instance.KeyViewerObject);
                 UnityEngine.Object.DontDestroyOnLoad(go);
-                KeyViewerLine = ViewerSetup.SetupLine(go);
+                KeyViewerLine = go.GetComponent<scrLineKeyViewer>();
+                //KeyViewerLine = ViewerSetup.SetupLine(go);
                 KeyViewerLine.mainImage.sprite = setting.HideDesk
                     ? LineBundleManager.Instance.Line
                     : LineBundleManager.Instance.LineTable;
