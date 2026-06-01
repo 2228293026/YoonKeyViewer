@@ -54,7 +54,8 @@ namespace YoonKeyViewer
                     YoonBundleManager.Instance = new YoonBundleManager();
                     GameObject gameObject = UnityEngine.Object.Instantiate(YoonBundleManager.Instance.KeyViewerObject);
                     UnityEngine.Object.DontDestroyOnLoad(gameObject);
-                    KeyViewer = ViewerSetup.SetupYoon(gameObject);
+                    KeyViewer = gameObject.GetComponent<scrYoonKeyViewer>();
+                    //KeyViewer = ViewerSetup.SetupYoon(gameObject);
                     KeyViewer.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
                     if (setting.FlipHorizontal) KeyViewer.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
                     if (setting.HideDesk) KeyViewer.Table.enable = 0;
@@ -64,7 +65,8 @@ namespace YoonKeyViewer
                     LineBundleManager.Instance = new LineBundleManager();
                     GameObject gameObject = UnityEngine.Object.Instantiate(LineBundleManager.Instance.KeyViewerObject);
                     UnityEngine.Object.DontDestroyOnLoad(gameObject);
-                    KeyViewerLine = ViewerSetup.SetupLine(gameObject);
+                    KeyViewerLine = gameObject.GetComponent<scrLineKeyViewer>();
+                    //KeyViewerLine = ViewerSetup.SetupLine(gameObject);
                     KeyViewerLine.mainImage.sprite = setting.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
                     KeyViewerLine.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
                     if (setting.FlipHorizontal) KeyViewerLine.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
