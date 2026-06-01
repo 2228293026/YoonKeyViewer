@@ -47,7 +47,6 @@ namespace YoonKeyViewer
                 PatchManager.Initialize(harmony);
                 VersionSafe.Setup();
                 GameLifecyclePatches.RegisterAll();
-                PatchManager.ApplyAll();
 
                 if (setting.Character == CharacterType.Yoon)
                 {
@@ -72,6 +71,7 @@ namespace YoonKeyViewer
                     if (setting.FlipHorizontal) KeyViewerLine.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
                 }
                 UpdateLocation();
+                PatchManager.ApplyAll();
 
                 KeyInputManager.NeedsReset = true;
             }

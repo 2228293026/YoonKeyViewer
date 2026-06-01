@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static TransformGizmoHolder;
 using Object = UnityEngine.Object;
 
 namespace YoonKeyViewer
@@ -75,8 +76,11 @@ namespace YoonKeyViewer
 
         public void Dispose()
         {
-            Bundle.Unload(true);
-            Instance = null;
+            if (Bundle != null)
+            {
+                Bundle.Unload(true);
+                Instance = null;
+            }
         }
     }
     public class YoonBundleManager
@@ -163,8 +167,11 @@ namespace YoonKeyViewer
 
         public void Dispose()
         {
-            Bundle.Unload(true);
-            Instance = null;
+            if (Bundle != null)
+            {
+                Bundle.Unload(true);
+                Instance = null;
+            }
         }
     }
 }
