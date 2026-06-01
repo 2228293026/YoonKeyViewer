@@ -1,0 +1,8 @@
+{
+  "Id": "YoonKeyViewer",
+  "DisplayName": "YoonKeyViewer",
+  "Author": "Jongyeol & Jofo",
+  "Version": "1.1.0",
+  "AssemblyName": "YoonKeyViewer.dll",
+  "EntryMethod": "YoonKeyViewer.Main.Setup"
+}
