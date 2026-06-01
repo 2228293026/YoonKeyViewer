@@ -12,14 +12,16 @@
 * 이미지에 대한 저작권은 [굥욷](https://www.youtube.com/@%EA%B5%A5%EC%9A%B7)님에게 있습니다.
 ---
 ### 개발 환경 Development environment
-* Windows 10
-* Visual Studio 2022
+* Windows 11
+* Visual Studio 2026
 * .NET Framework 4.8.1
 * C# 9
-* A Dance of Fire and Ice 2.9.6
+* A Dance of Fire and Ice 2.9.8
+* A Dance of Fire and Ice 3.1.0
 ---
 ### 테스트 환경 Test environment
-* Windows 10
-* A Dance of Fire and Ice 2.9.6
+* Windows 11
+* A Dance of Fire and Ice 2.9.8
+* A Dance of Fire and Ice 3.1.0
 ---
 # [Join Jongyeol's Discord!](https://discord.jongyeol.kr)
