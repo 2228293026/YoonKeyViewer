@@ -81,6 +81,36 @@ namespace YoonKeyViewer
             return viewer;
         }
 
+        // ── Delebi ──
+
+        public static scrDelebiKeyViewer SetupDelebi(GameObject root)
+        {
+            var viewer = root.AddComponent<scrDelebiKeyViewer>();
+            Transform sizeObj = root.transform.Find("LocationObject/SizeObject");
+            Transform locObj = root.transform.Find("LocationObject");
+
+            viewer.locationTransform = locObj?.GetComponent<RectTransform>();
+            viewer.sizeTransform = sizeObj?.GetComponent<RectTransform>();
+
+            // AsyncImage children
+            viewer.Delebi = AddAsyncImage(sizeObj, "Delebi");
+            viewer.DelebiSmash = AddHiddenAsyncImage(sizeObj, "DelebiSmash");
+            viewer.DelebiClear = AddHiddenAsyncImage(sizeObj, "DelebiClear");
+            viewer.leftHand = AddAsyncImage(sizeObj, "LeftHand");
+            viewer.rightHand = AddAsyncImage(sizeObj, "RightHand");
+
+            // Key children (10 keys)
+            viewer.keys = new Key[10];
+            for (int i = 0; i < 10; i++)
+                viewer.keys[i] = AddKey(sizeObj, $"Key{i + 1}");
+
+            viewer.isSmashing = false;
+            viewer.winkOn = false;
+            viewer.gameResult = false;
+
+            return viewer;
+        }
+
         // ── Helpers ──
 
         private static AsyncImage AddAsyncImage(Transform parent, string childName)

@@ -12,6 +12,8 @@ public class CreateAssetBundles
         SetBundle("Assets/Textures2D/Yoon", "ykv_assets", true);
         SetBundle("Assets/Prefabs/LineKeyViewer.prefab", "line");
         SetBundle("Assets/Textures2D/Line", "line", true);
+        SetBundle("Assets/Prefabs/DelebiKeyViewer.prefab", "dkv_assets");
+        SetBundle("Assets/Textures2D/Delebi", "dkv_assets", true);
         AssetDatabase.Refresh();
 
         string outDir = "Assets/AssetBundles";
@@ -23,7 +25,7 @@ public class CreateAssetBundles
             BuildTarget.StandaloneWindows
         );
 
-        foreach (string name in new[] { "ykv_assets", "line" })
+        foreach (string name in new[] { "ykv_assets", "line", "dkv_assets" })
         {
             string src = Path.Combine(outDir, name);
             string dst = src + ".bundle";

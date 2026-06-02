@@ -10,6 +10,7 @@ namespace YoonKeyViewer
     public static class KeyInputManager
     {
         public static readonly int[] HandLocation = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 9, 8, 10, 11, 14, 15 };
+        public static readonly int[] HandLocationDelebi = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         public static readonly int[] LegLocation = new int[] { 0, 1, 2, 3 };
 
         [DllImport("user32.dll")]
@@ -101,13 +102,24 @@ namespace YoonKeyViewer
             var s = Main.setting;
             var h = new bool[16];
             var f = new bool[4];
-            for (int i = 0; i < 16; i++)
-                h[i] = CheckKey(s.KeyCodes[HandLocation[i]]);
-            for (int i = 0; i < 4; i++)
-                f[i] = CheckKey(s.FKeyCodes[LegLocation[i]]);
+
+            int[] handLoc = s.Character == CharacterType.Delebi ? HandLocationDelebi : HandLocation;
+            int keyCount = s.Character == CharacterType.Delebi ? 10 : 16;
+            var codes = s.Character == CharacterType.Yoon ? s.YoonKeyCodes
+                : s.Character == CharacterType.Line ? s.LineKeyCodes
+                : s.DelebiKeyCodes;
+            for (int i = 0; i < keyCount; i++)
+                h[i] = CheckKey(codes[handLoc[i]]);
+            if (s.Character != CharacterType.Delebi)
+            {
+                for (int i = 0; i < 4; i++)
+                    f[i] = CheckKey(s.FKeyCodes[LegLocation[i]]);
+            }
 
             if (s.Character == CharacterType.Line)
                 ApplyKeyStatesLine(h);
+            else if (s.Character == CharacterType.Delebi)
+                ApplyKeyStatesDelebi(h);
             else
                 ApplyKeyStatesYoon(h, f);
         }
@@ -263,6 +275,71 @@ namespace YoonKeyViewer
         }
         #endregion
 
+        #region Delebi key state apply (main thread)
+        private static void ApplyKeyStatesDelebi(bool[] h)
+        {
+            var v = Main.KeyViewerDelebi;
+            if (v == null) return;
+            var s = Main.setting;
+
+            if (NeedsReset)
+            {
+                for (int i = 0; i < 10; i++)
+                    { if (v.keys[i] != null) v.keys[i].enable = 0; _prevHand[i] = false; }
+                _leftPressed.Clear(); _rightPressed.Clear();
+                if (v.leftHand) v.leftHand.sprite = DelebiBundleManager.Instance.UnpressedKeySprites[0];
+                if (v.rightHand) v.rightHand.sprite = DelebiBundleManager.Instance.UnpressedKeySprites[1];
+                _mainCount = 0; NeedsReset = false;
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                bool cur = h[i];
+                if (cur == _prevHand[i]) continue;
+                int num = s.FlipHorizontal ? (i < 8 ? 7 : 9 - (i - 8)) : i;
+                bool left = num < 4 || num == 8;
+                var key = v.keys[num];
+                if (key == null) continue;
+                _prevHand[i] = cur;
+                key.enable = (sbyte)(cur ? 1 : 0);
+                var pl = left ? _leftPressed : _rightPressed;
+                if (cur)
+                {
+                    pl.Add(num);
+                    (left ? v.leftHand : v.rightHand).sprite
+                        = DelebiBundleManager.Instance.PressedKeySprites[num];
+                }
+                else
+                {
+                    pl.Remove(num);
+                    (left ? v.leftHand : v.rightHand).sprite
+                        = pl.Count == 0
+                            ? DelebiBundleManager.Instance.UnpressedKeySprites[left ? 0 : 1]
+                            : DelebiBundleManager.Instance.PressedKeySprites[pl[pl.Count - 1]];
+                }
+                if (i >= 8) continue;
+                if (cur) _mainCount++; else _mainCount--;
+                if (v.gameResult) continue;
+
+                if (_mainCount < 8)
+                {
+                    if (!v.isSmashing) continue;
+                    v.DelebiSmash.sprite = v.DelebiSmash.image.sprite
+                        = DelebiBundleManager.Instance.DelebiSmash;
+                    v.Delebi.enable = 1; v.leftHand.enable = 1;
+                    v.rightHand.enable = 1; v.DelebiSmash.enable = 0;
+                    v.winkOn = false; v.isSmashing = false;
+                }
+                else if (!v.isSmashing)
+                {
+                    v.Delebi.enable = 0; v.leftHand.enable = 0;
+                    v.rightHand.enable = 0; v.DelebiSmash.enable = 1;
+                    v.isSmashing = true;
+                }
+            }
+        }
+        #endregion
+
         #region Character lifecycle (called from Harmony patches on main thread)
         public static void DieYoon()
         {
@@ -340,6 +417,49 @@ namespace YoonKeyViewer
             v.leftHand.enable = 1; v.rightHand.enable = 1;
             v.mainImage.sprite = Main.setting.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
             v.mainImage.enable = 1;
+        }
+
+        public static void DieDelebi()
+        {
+            var v = Main.KeyViewerDelebi;
+            if (v == null || v.gameResult) return;
+            v.gameResult = true; v.isSmashing = false; v.winkOn = false;
+            v.DelebiClear.sprite = v.DelebiClear.image.sprite
+                = DelebiBundleManager.Instance.DelebiDie;
+            v.DelebiClear.enable = 1; v.Delebi.enable = 0;
+            v.leftHand.enable = 1; v.rightHand.enable = 1;
+            v.DelebiSmash.enable = 0;
+        }
+
+        public static void ClearDelebi()
+        {
+            var v = Main.KeyViewerDelebi;
+            if (v == null || v.gameResult) return;
+            v.gameResult = true; v.isSmashing = false; v.winkOn = false;
+            v.Delebi.enable = 0; v.leftHand.enable = 0;
+            v.rightHand.enable = 0; v.DelebiSmash.enable = 0;
+            v.DelebiClear.sprite = v.DelebiClear.image.sprite
+                = DelebiBundleManager.Instance.DelebiClear;
+            v.DelebiClear.enable = 1;
+        }
+
+        public static void ResetPatchDelebi()
+        {
+            var v = Main.KeyViewerDelebi;
+            if (v == null) return;
+            if (!v.gameResult)
+                v.Delebi.sprite = v.Delebi.image.sprite
+                    = DelebiBundleManager.Instance.DelebiIdle;
+            v.Delebi.enable = 1; v.leftHand.enable = 1; v.rightHand.enable = 1;
+            if (v.DelebiClear.image.enabled && v.gameResult)
+                { v.Delebi.enable = 0; v.DelebiClear.enable = 1; }
+            else { v.DelebiClear.enable = 0; }
+            if (v.DelebiSmash.image.enabled && v.isSmashing)
+                { v.Delebi.enable = 0; v.leftHand.enable = 0;
+                  v.rightHand.enable = 0; v.DelebiSmash.enable = 1; }
+            else { v.DelebiSmash.enable = 0;
+                   v.DelebiSmash.image.sprite = DelebiBundleManager.Instance.DelebiSmash; }
+            v.gameResult = false;
         }
         #endregion
     }

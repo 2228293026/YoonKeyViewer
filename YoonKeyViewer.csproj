@@ -31,14 +31,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'BepInEx|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\BepInEx\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;BEPINEX</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>$(ProjectDir)Libs\0Harmony.dll</HintPath>
@@ -119,13 +111,6 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-  <!-- BepInEx reference (only for BepInEx configuration) -->
-  <ItemGroup Condition="'$(Configuration)' == 'BepInEx'">
-    <Reference Include="BepInEx">
-      <HintPath>$(ProjectDir)Libs\BepInEx.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModScripts\BundleManager.cs" />
@@ -145,6 +130,7 @@
     <Compile Include="Assets\Scripts\AsyncImage.cs" />
     <Compile Include="Assets\Scripts\scrYoonKeyViewer.cs" />
     <Compile Include="Assets\Scripts\scrLineKeyViewer.cs" />
+    <Compile Include="Assets\Scripts\scrDelebiKeyViewer.cs" />
     <!-- ResultHandler.cs replaced by GameLifecyclePatches.cs + PatchLogic.cs -->
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

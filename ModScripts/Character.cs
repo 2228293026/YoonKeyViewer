@@ -1,5 +1,6 @@
 public enum CharacterType
 {
     Yoon,
-    Line
+    Line,
+    Delebi
 }

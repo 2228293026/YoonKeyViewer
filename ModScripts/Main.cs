@@ -6,7 +6,6 @@ using System.Threading;
 using UnityEngine;
 using YoonKeyViewer.Component;
 
-#if UNITYMODMANAGER
 using UnityModManagerNet;
 
 // Jongyeol if you are reading this, excuse my bad code :p
@@ -21,6 +20,7 @@ namespace YoonKeyViewer
         public static Setting setting;
         public static scrYoonKeyViewer KeyViewer;
         public static scrLineKeyViewer KeyViewerLine;
+        public static scrDelebiKeyViewer KeyViewerDelebi;
         private static int SelectedKey;
         private static int WinAPICool;
         private static bool[] KeyPressed = null;
@@ -59,7 +59,7 @@ namespace YoonKeyViewer
                     if (setting.FlipHorizontal) KeyViewer.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
                     if (setting.HideDesk) KeyViewer.Table.enable = 0;
                 }
-                else
+                else if (setting.Character == CharacterType.Line)
                 {
                     LineBundleManager.Instance = new LineBundleManager();
                     GameObject gameObject = UnityEngine.Object.Instantiate(LineBundleManager.Instance.KeyViewerObject);
@@ -69,6 +69,15 @@ namespace YoonKeyViewer
                     KeyViewerLine.mainImage.sprite = setting.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
                     KeyViewerLine.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
                     if (setting.FlipHorizontal) KeyViewerLine.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
+                }
+                else
+                {
+                    DelebiBundleManager.Instance = new DelebiBundleManager();
+                    GameObject gameObject = UnityEngine.Object.Instantiate(DelebiBundleManager.Instance.KeyViewerObject);
+                    UnityEngine.Object.DontDestroyOnLoad(gameObject);
+                    KeyViewerDelebi = gameObject.GetComponent<scrDelebiKeyViewer>();
+                    KeyViewerDelebi.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
+                    if (setting.FlipHorizontal) KeyViewerDelebi.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
                 }
                 UpdateLocation();
                 PatchManager.ApplyAll();
@@ -87,9 +96,15 @@ namespace YoonKeyViewer
                     UnityEngine.Object.Destroy(KeyViewerLine.gameObject);
                     KeyViewerLine = null;
                 }
+                if (KeyViewerDelebi)
+                {
+                    UnityEngine.Object.Destroy(KeyViewerDelebi.gameObject);
+                    KeyViewerDelebi = null;
+                }
                 KeyInputManager.NeedsReset = true;
                 YoonBundleManager.Instance?.Dispose();
                 LineBundleManager.Instance?.Dispose();
+                DelebiBundleManager.Instance?.Dispose();
                 PatchManager.UnpatchAll();
             }
             return true;
@@ -108,6 +123,11 @@ namespace YoonKeyViewer
                 UnityEngine.Object.DestroyImmediate(KeyViewerLine.gameObject);
                 KeyViewerLine = null;
             }
+            if (KeyViewerDelebi)
+            {
+                UnityEngine.Object.DestroyImmediate(KeyViewerDelebi.gameObject);
+                KeyViewerDelebi = null;
+            }
 
             // Create new character's viewer
             if (setting.Character == CharacterType.Yoon)
@@ -120,7 +140,7 @@ namespace YoonKeyViewer
                 //KeyViewer = ViewerSetup.SetupYoon(go);
                 if (setting.HideDesk) KeyViewer.Table.enable = 0;
             }
-            else
+            else if (setting.Character == CharacterType.Line)
             {
                 if (LineBundleManager.Instance == null)
                     LineBundleManager.Instance = new LineBundleManager();
@@ -131,6 +151,16 @@ namespace YoonKeyViewer
                 KeyViewerLine.mainImage.sprite = setting.HideDesk
                     ? LineBundleManager.Instance.Line
                     : LineBundleManager.Instance.LineTable;
+            }
+            else
+            {
+                if (DelebiBundleManager.Instance == null)
+                    DelebiBundleManager.Instance = new DelebiBundleManager();
+                GameObject go = UnityEngine.Object.Instantiate(DelebiBundleManager.Instance.KeyViewerObject);
+                UnityEngine.Object.DontDestroyOnLoad(go);
+                KeyViewerDelebi = go.GetComponent<scrDelebiKeyViewer>();
+                KeyViewerDelebi.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
+                if (setting.FlipHorizontal) KeyViewerDelebi.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
             }
 
             // Apply size & flip
@@ -149,9 +179,9 @@ namespace YoonKeyViewer
             GUILayout.Label($"{setting.GetLocalized("ykv.settingslabel")}");
 
             // Character selector
-            string[] charNames = { "Yoon", "Line" };
+            string[] charNames = { "Yoon", "Line", "Delebi" };
             int charIdx = (int)setting.Character;
-            int newCharIdx = GUILayout.SelectionGrid(charIdx, charNames, 2);
+            int newCharIdx = GUILayout.SelectionGrid(charIdx, charNames, 3);
             if (newCharIdx != charIdx)
             {
                 setting.Character = (CharacterType)newCharIdx;
@@ -166,6 +196,7 @@ namespace YoonKeyViewer
                 var scale = new Vector3(setting.Size, setting.Size);
                 if (KeyViewer?.sizeTransform) KeyViewer.sizeTransform.localScale = scale;
                 if (KeyViewerLine?.sizeTransform) KeyViewerLine.sizeTransform.localScale = scale;
+                if (KeyViewerDelebi?.sizeTransform) KeyViewerDelebi.sizeTransform.localScale = scale;
                 UpdateLocation();
             }
             float newLocationX = NamedSlider($"{setting.GetLocalized("ykv.posx")}:", setting.LocationX, 0, 1, 250);
@@ -197,15 +228,19 @@ namespace YoonKeyViewer
                 var angles = new Vector3(0, setting.FlipHorizontal ? 180 : 0, 0);
                 if (KeyViewer?.sizeTransform) KeyViewer.sizeTransform.eulerAngles = angles;
                 if (KeyViewerLine?.sizeTransform) KeyViewerLine.sizeTransform.eulerAngles = angles;
+                if (KeyViewerDelebi?.sizeTransform) KeyViewerDelebi.sizeTransform.eulerAngles = angles;
                 KeyInputManager.NeedsReset = true;
             }
-            bool newHideDesk = GUILayout.Toggle(setting.HideDesk, $"{setting.GetLocalized("ykv.hidedesk")}:");
-            if (newHideDesk !=  setting.HideDesk)
+            if (setting.Character != CharacterType.Delebi)
             {
-                setting.HideDesk = newHideDesk;
-                if (KeyViewer) KeyViewer.Table.enable = setting.HideDesk ? (sbyte)0 : (sbyte)1;
-                if (KeyViewerLine) KeyViewerLine.mainImage.sprite = setting.HideDesk
-                    ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
+                bool newHideDesk = GUILayout.Toggle(setting.HideDesk, $"{setting.GetLocalized("ykv.hidedesk")}:");
+                if (newHideDesk != setting.HideDesk)
+                {
+                    setting.HideDesk = newHideDesk;
+                    if (KeyViewer) KeyViewer.Table.enable = setting.HideDesk ? (sbyte)0 : (sbyte)1;
+                    if (KeyViewerLine) KeyViewerLine.mainImage.sprite = setting.HideDesk
+                        ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
+                }
             }
 
             bool oldHideFeet = setting.HideFeet;
@@ -240,14 +275,22 @@ namespace YoonKeyViewer
             GUILayout.Space(18f);
             GUILayout.Label(setting.GetLocalized("ykv.toprow"));
             GUILayout.BeginHorizontal();
-            for (int i = 0; i < 8; i++) CreateButton(i);
+            int keyCount = setting.Character == CharacterType.Delebi ? 10 : 16;
+            for (int i = 0; i < Math.Min(8, keyCount); i++) CreateButton(i);
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
             // Bottom Row
             GUILayout.Label(setting.GetLocalized("ykv.bottomrow"));
             GUILayout.BeginHorizontal();
-            for (int i = 8; i < 16; i++) CreateButton(KeyInputManager.HandLocation[i]);
+            if (setting.Character == CharacterType.Delebi)
+            {
+                for (int i = 8; i < 10; i++) CreateButton(i);
+            }
+            else
+            {
+                for (int i = 8; i < 16; i++) CreateButton(KeyInputManager.HandLocation[i]);
+            }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
@@ -293,7 +336,10 @@ namespace YoonKeyViewer
 
         private static void CreateButton(int i)
         {
-            if (!GUILayout.Button(Bold(KeyToString(setting.KeyCodes[i]), i == SelectedKey))) return;
+            var codes = setting.Character == CharacterType.Yoon ? setting.YoonKeyCodes
+                : setting.Character == CharacterType.Line ? setting.LineKeyCodes
+                : setting.DelebiKeyCodes;
+            if (!GUILayout.Button(Bold(KeyToString(codes[i]), i == SelectedKey))) return;
             SelectedKey = i;
             WinAPICool = 0;
             KeyPressed = new bool[256];
@@ -315,9 +361,17 @@ namespace YoonKeyViewer
             {
                 setting.FKeyCodes[SelectedKey - 100] = keyCode;
             }
+            else if (setting.Character == CharacterType.Delebi)
+            {
+                setting.DelebiKeyCodes[SelectedKey] = keyCode;
+            }
+            else if (setting.Character == CharacterType.Line)
+            {
+                setting.LineKeyCodes[SelectedKey] = keyCode;
+            }
             else
             {
-                setting.KeyCodes[SelectedKey] = keyCode;
+                setting.YoonKeyCodes[SelectedKey] = keyCode;
             }
 
             SelectedKey = -4;
@@ -345,6 +399,8 @@ namespace YoonKeyViewer
         {
             if (setting.Character == CharacterType.Line)
                 UpdateWinkingLine();
+            else if (setting.Character == CharacterType.Delebi)
+                UpdateWinkingDelebi();
             else
                 UpdateWinkingYoon();
         }
@@ -425,10 +481,49 @@ namespace YoonKeyViewer
             }
         }
 
+        private static void UpdateWinkingDelebi()
+        {
+            var dv = KeyViewerDelebi;
+            if (dv == null) return;
+
+            if (_winkInProgress)
+            {
+                if (Time.time >= _winkEndTime)
+                {
+                    _winkInProgress = false;
+                    if (dv.winkOn)
+                    {
+                        dv.winkOn = false;
+                        dv.Delebi.sprite = DelebiBundleManager.Instance.DelebiIdle;
+                        dv.DelebiSmash.enable = 0;
+                        dv.DelebiClear.enable = 0;
+                    }
+                    _nextWinkTime = Time.time + UnityEngine.Random.Range(3f, 7f);
+                }
+                return;
+            }
+
+            if (dv.isSmashing || dv.gameResult)
+            {
+                _nextWinkTime = Time.time + UnityEngine.Random.Range(1f, 3f);
+                return;
+            }
+
+            if (Time.time >= _nextWinkTime)
+            {
+                _winkInProgress = true;
+                _winkEndTime = Time.time + UnityEngine.Random.Range(0.1f, 0.25f);
+                dv.winkOn = true;
+                dv.Delebi.sprite = DelebiBundleManager.Instance.DelebiIdleWink;
+                dv.DelebiSmash.enable = 0;
+                dv.DelebiClear.enable = 0;
+            }
+        }
+
         private static void UpdateLocation()
         {
             float y = 1 - setting.LocationY;
-            RectTransform rectTransform = KeyViewer?.locationTransform ?? KeyViewerLine?.locationTransform;
+            RectTransform rectTransform = KeyViewer?.locationTransform ?? KeyViewerLine?.locationTransform ?? KeyViewerDelebi?.locationTransform;
             if (rectTransform == null) return;
             rectTransform.sizeDelta = new Vector2(540 * setting.Size, 420 * setting.Size);
             rectTransform.pivot = new Vector2(setting.LocationX, y);
@@ -552,209 +647,3 @@ namespace YoonKeyViewer
         }
     }
 }
-#endif
-
-#if BEPINEX
-using BepInEx;
-using BepInEx.Logging;
-using System.IO;
-
-namespace YoonKeyViewer
-{
-    public static class YoonKeyViewerInfo
-    {
-        public const string PLUGIN_GUID = "BepInEx5.YoonKeyViewer";
-        public const string PLUGIN_NAME = "YoonKeyViewer";
-        public const string PLUGIN_VERSION = "1.0.0";
-    }
-
-    // Keep this so you can still use Logger.Log(...) instead of Logger.LogInfo(...)
-    public static class LoggerExtensions
-    {
-        public static void Log(this ManualLogSource logger, string message)
-        {
-            logger.LogInfo(message);
-        }
-    }
-
-
-    [BepInPlugin(YoonKeyViewerInfo.PLUGIN_GUID, YoonKeyViewerInfo.PLUGIN_NAME, YoonKeyViewerInfo.PLUGIN_VERSION)]
-    public class Main : BaseUnityPlugin
-    {
-
-        public static Main Instance;
-        public static ManualLogSource Logger;
-        public static string ModPath => Path.Combine(Paths.PluginPath, "YoonKeyViewer");
-        public static Setting setting;
-        public static scrYoonKeyViewer KeyViewer;
-        public static scrLineKeyViewer KeyViewerLine;
-        public static YoonBundleManager BundleManager;
-        public static bool IsEnabled = false;
-
-        private static Thread inputThread;
-        private static Thread winkThread;
-        private Harmony harmony;
-
-        private void Awake()
-        {
-            Instance = this;
-            Logger = base.Logger;
-            Logger.LogInfo("YoonKeyViewer Awake");
-            // Init settings
-            setting = new Setting(); // You may need to pass the correct path
-
-            // Load character viewer
-            if (setting.Character == CharacterType.Yoon)
-            {
-                BundleManager = YoonBundleManager.Instance = new YoonBundleManager();
-                GameObject obj = Instantiate(BundleManager.KeyViewerObject);
-                DontDestroyOnLoad(obj);
-                KeyViewer = ViewerSetup.SetupYoon(obj);
-            }
-            else
-            {
-                LineBundleManager.Instance = new LineBundleManager();
-                GameObject obj = Instantiate(LineBundleManager.Instance.KeyViewerObject);
-                DontDestroyOnLoad(obj);
-                KeyViewerLine = ViewerSetup.SetupLine(obj);
-            }
-
-            ApplySettings();
-
-            // Start input & wink threads
-            KeyInputManager.Reset = true;
-            inputThread = new Thread(KeyInputManager.ListenKey) { IsBackground = true };
-            winkThread = new Thread(Winking) { IsBackground = true };
-            inputThread.Start();
-            winkThread.Start();
-
-            Application.quitting += OnQuitting;
-
-            // Attach GUI
-            GameObject guiObj = new GameObject("YoonKeyViewerGUI");
-            //guiObj.AddComponent<YoonKeyViewerGUI>();
-            DontDestroyOnLoad(guiObj);
-            IsEnabled = true;
-
-            // Init Harmony patches
-            harmony = new Harmony(YoonKeyViewerInfo.PLUGIN_GUID);
-            PatchManager.Initialize(harmony);
-            VersionSafe.Setup();
-            GameLifecyclePatches.RegisterAll();
-            PatchManager.ApplyAll();
-
-        }
-
-        private void ApplySettings()
-        {
-            if (KeyViewer)
-            {
-                KeyViewer.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
-                KeyViewer.sizeTransform.eulerAngles = new Vector3(0, setting.FlipHorizontal ? 180 : 0, 0);
-                if (setting.HideDesk) KeyViewer.Table.enable = 0;
-            }
-            if (KeyViewerLine)
-            {
-                KeyViewerLine.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
-                KeyViewerLine.sizeTransform.eulerAngles = new Vector3(0, setting.FlipHorizontal ? 180 : 0, 0);
-            }
-            UpdateLocation();
-        }
-
-        public void UpdateLocation()
-        {
-            float y = 1f - setting.LocationY;
-            RectTransform rt = KeyViewer?.locationTransform ?? KeyViewerLine?.locationTransform;
-            if (rt == null) return;
-            rt.sizeDelta = new Vector2(540 * setting.Size, 420 * setting.Size);
-            rt.pivot = new Vector2(setting.LocationX, y);
-            rt.anchoredPosition = new Vector2(setting.LocationX * 1920, y * 1080);
-        }
-
-        private void Winking()
-        {
-            try
-            {
-                if (setting.Character == CharacterType.Line)
-                    WinkingLine();
-                else
-                    WinkingYoon();
-            }
-            catch (ThreadAbortException)
-            {
-                // expected on quit
-            }
-            catch (Exception e)
-            {
-                Logger.LogError($"[Winking] Exception: {e}");
-            }
-        }
-
-        private void WinkingYoon()
-        {
-            while (true)
-            {
-                Thread.Sleep(UnityEngine.Random.Range(3000, 7000));
-
-                if (KeyViewer.isSmashing || KeyViewer.gameResult || KeyViewer.isNervous)
-                    continue;
-
-                KeyViewer.winkOn = true;
-                KeyViewer.Yoon.sprite = YoonBundleManager.Instance.YoonIdleWink;
-                KeyViewer.YoonSmash.enable = 0;
-                KeyViewer.YoonClear.enable = 0;
-                KeyViewer.Table.enable = setting.HideDesk ? (sbyte)0 : (sbyte)1;
-
-                Thread.Sleep(UnityEngine.Random.Range(100, 250));
-                if (!KeyViewer.winkOn) continue;
-
-                KeyViewer.winkOn = false;
-                KeyViewer.Yoon.sprite = YoonBundleManager.Instance.YoonIdle;
-                KeyViewer.Table.enable = setting.HideDesk ? (sbyte)0 : (sbyte)1;
-            }
-        }
-
-        private void WinkingLine()
-        {
-            scrLineKeyViewer lv = KeyViewerLine;
-            while (true)
-            {
-                Thread.Sleep(UnityEngine.Random.Range(3000, 7000));
-
-                if (lv.headOn || lv.gameResult)
-                    continue;
-
-                lv.winkOn = true;
-                lv.mainImage.sprite = setting.HideDesk ? LineBundleManager.Instance.LineWink : LineBundleManager.Instance.LineWinkTable;
-                lv.mainImage.enable = 1;
-
-                Thread.Sleep(UnityEngine.Random.Range(100, 250));
-                if (!lv.winkOn) continue;
-
-                lv.winkOn = false;
-                lv.mainImage.sprite = setting.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
-            }
-        }
-
-        private void OnQuitting()
-        {
-            inputThread?.Abort();
-            winkThread?.Abort();
-            inputThread = null;
-            winkThread = null;
-        }
-
-        private void OnDestroy()
-        {
-            if (KeyViewer)
-                Destroy(KeyViewer.gameObject);
-            if (KeyViewerLine)
-                Destroy(KeyViewerLine.gameObject);
-
-            YoonBundleManager.Instance?.Dispose();
-            LineBundleManager.Instance?.Dispose();
-            PatchManager.UnpatchAll();
-        }
-    }
-}
-#endif

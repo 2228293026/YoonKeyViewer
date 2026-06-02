@@ -136,6 +136,14 @@ namespace YoonKeyViewer
                     { SystemLanguage.Korean, "캐릭터" },
                     { SystemLanguage.ChineseSimplified, "角色" }
                 }
+            },
+            {
+                "ykv.char.delebi", new()
+                {
+                    { SystemLanguage.English, "Delebi" },
+                    { SystemLanguage.Korean, "델레비" },
+                    { SystemLanguage.ChineseSimplified, "Delebi" }
+                }
             }
         };
         public CharacterType Character = CharacterType.Yoon;
@@ -152,7 +160,15 @@ namespace YoonKeyViewer
         [JsonIgnore]
         public bool KeyCodeJipperResourcePack = false;
 
-        public KeyCode[] KeyCodes = new KeyCode[]
+        public KeyCode[] YoonKeyCodes = new KeyCode[]
+        {
+            KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
+            KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.Semicolon,
+            KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V,
+            KeyCode.N, KeyCode.M, KeyCode.Comma, KeyCode.Period
+        };
+
+        public KeyCode[] LineKeyCodes = new KeyCode[]
         {
             KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
             KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.Semicolon,
@@ -163,6 +179,13 @@ namespace YoonKeyViewer
         public KeyCode[] FKeyCodes = new KeyCode[]
         {
             KeyCode.F2, KeyCode.F3, KeyCode.F7, KeyCode.F8
+        };
+
+        public KeyCode[] DelebiKeyCodes = new KeyCode[]
+        {
+            KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
+            KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.Semicolon,
+            KeyCode.Z, KeyCode.X
         };
 
         public string GetLocalized(string key)
@@ -176,7 +199,6 @@ namespace YoonKeyViewer
             return langDict?.TryGetValue(SystemLanguage.English, out var fallback) == true ? fallback : key;
         }
 
-#if !BEPINEX
         public override void Save(UnityModManager.ModEntry modEntry)
         {
             try
@@ -220,9 +242,6 @@ namespace YoonKeyViewer
                 var json = File.ReadAllText(filepath);
                 var setting = JsonConvert.DeserializeObject<Setting>(json, settings) ?? new Setting();
 
-                // Optional external call
-                //JipperResourcePackAPI.CheckJipperResourcePack(); // Remove or replace if needed
-
                 return setting;
             }
             catch (Exception e)
@@ -231,7 +250,6 @@ namespace YoonKeyViewer
                 return new Setting();
             }
         }
-#endif
         //public void ShareJipperKeyCode(bool enable)
         //{
         //    if (enable)

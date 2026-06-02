@@ -16,6 +16,8 @@ namespace YoonKeyViewer
         {
             if (Main.setting.Character == CharacterType.Line)
                 KeyInputManager.DieLine();
+            else if (Main.setting.Character == CharacterType.Delebi)
+                KeyInputManager.DieDelebi();
             else
                 KeyInputManager.DieYoon();
         }
@@ -28,6 +30,8 @@ namespace YoonKeyViewer
             {
                 if (Main.setting.Character == CharacterType.Line)
                     KeyInputManager.DieLine();
+                else if (Main.setting.Character == CharacterType.Delebi)
+                    KeyInputManager.DieDelebi();
                 else
                     KeyInputManager.DieYoon();
             }
@@ -35,6 +39,8 @@ namespace YoonKeyViewer
             {
                 if (Main.setting.Character == CharacterType.Line)
                     KeyInputManager.ClearLine();
+                else if (Main.setting.Character == CharacterType.Delebi)
+                    KeyInputManager.ClearDelebi();
                 else
                     KeyInputManager.ClearYoon();
             }
@@ -46,6 +52,8 @@ namespace YoonKeyViewer
             if (Main.KeyViewer) Main.KeyViewer.isNervous = false;
             if (Main.setting.Character == CharacterType.Line)
                 KeyInputManager.ResetPatchLine();
+            else if (Main.setting.Character == CharacterType.Delebi)
+                KeyInputManager.ResetPatchDelebi();
             else
                 KeyInputManager.ResetPatchYoon();
         }
@@ -56,6 +64,8 @@ namespace YoonKeyViewer
             if (Main.KeyViewer) Main.KeyViewer.isNervous = false;
             if (Main.setting.Character == CharacterType.Line)
                 KeyInputManager.ResetPatchLine();
+            else if (Main.setting.Character == CharacterType.Delebi)
+                KeyInputManager.ResetPatchDelebi();
             else
                 KeyInputManager.ResetPatchYoon();
         }
@@ -66,6 +76,8 @@ namespace YoonKeyViewer
             if (Main.KeyViewer) Main.KeyViewer.isNervous = false;
             if (Main.setting.Character == CharacterType.Line)
                 KeyInputManager.ResetPatchLine();
+            else if (Main.setting.Character == CharacterType.Delebi)
+                KeyInputManager.ResetPatchDelebi();
             else
                 KeyInputManager.ResetPatchYoon();
         }
@@ -76,6 +88,8 @@ namespace YoonKeyViewer
             if (Main.KeyViewer) Main.KeyViewer.isNervous = false;
             if (Main.setting.Character == CharacterType.Line)
                 KeyInputManager.ResetPatchLine();
+            else if (Main.setting.Character == CharacterType.Delebi)
+                KeyInputManager.ResetPatchDelebi();
             else
                 KeyInputManager.ResetPatchYoon();
         }
@@ -86,6 +100,8 @@ namespace YoonKeyViewer
             if (Main.KeyViewer) Main.KeyViewer.isNervous = false;
             if (Main.setting.Character == CharacterType.Line)
                 KeyInputManager.ResetPatchLine();
+            else if (Main.setting.Character == CharacterType.Delebi)
+                KeyInputManager.ResetPatchDelebi();
             else
                 KeyInputManager.ResetPatchYoon();
         }
@@ -93,6 +109,7 @@ namespace YoonKeyViewer
         /// <summary>
         /// Handle MoveToNextFloor — update nervous state based on current BPM.
         /// Uses VersionSafe for version-agnostic BPM/speed access.
+        /// Only Yoon has nervous state.
         /// </summary>
         public static void OnMoveToNextFloor(scrPlanet __instance)
         {
