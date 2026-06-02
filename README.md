@@ -17,11 +17,11 @@
 * .NET Framework 4.8.1
 * C# 9
 * A Dance of Fire and Ice 2.9.8
-* A Dance of Fire and Ice 3.1.0
+* A Dance of Fire and Ice 3.1.1
 ---
 ### 테스트 환경 Test environment
 * Windows 11
 * A Dance of Fire and Ice 2.9.8
-* A Dance of Fire and Ice 3.1.0
+* A Dance of Fire and Ice 3.1.1
 ---
 # [Join Jongyeol's Discord!](https://discord.jongyeol.kr)
