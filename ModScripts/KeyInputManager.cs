@@ -397,7 +397,7 @@ namespace YoonKeyViewer
                 v.Yoon.enable = 0; v.leftHand.enable = 0; v.rightHand.enable = 0; v.YoonSmash.enable
 = 1;
             }
-            else { v.YoonSmash.enable = 0; v.YoonSmash.image.sprite = YoonBundleManager.Instance.YoonSmash; }
+            else { v.YoonSmash.enable = 0; v.YoonSmash.sprite = YoonBundleManager.Instance.YoonSmash; }
             v.gameResult = false;
         }
 
@@ -468,7 +468,7 @@ namespace YoonKeyViewer
                 { v.Delebi.enable = 0; v.leftHand.enable = 0;
                   v.rightHand.enable = 0; v.DelebiSmash.enable = 1; }
             else { v.DelebiSmash.enable = 0;
-                   v.DelebiSmash.image.sprite = DelebiBundleManager.Instance.DelebiSmash; }
+                   v.DelebiSmash.sprite = DelebiBundleManager.Instance.DelebiSmash; }
             v.gameResult = false;
         }
         #endregion
