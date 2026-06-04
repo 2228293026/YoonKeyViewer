@@ -89,6 +89,8 @@ namespace YoonKeyViewer
         // ── 主线程内部状态（只在 OnUpdate 访问） ──
         private static readonly bool[] _prevHand = new bool[16];
         private static readonly bool[] _prevFoot = new bool[4];
+        private static readonly bool[] _hBuffer = new bool[16];
+        private static readonly bool[] _fBuffer = new bool[4];
         private static readonly List<int> _leftPressed = new();
         private static readonly List<int> _rightPressed = new();
         private static int _mainCount;
@@ -100,26 +102,24 @@ namespace YoonKeyViewer
         {
             if (Main.setting == null) return;
             var s = Main.setting;
-            var h = new bool[16];
-            var f = new bool[4];
 
             int[] handLoc = s.Character == CharacterType.Delebi ? HandLocationDelebi : HandLocation;
             int keyCount = s.Character == CharacterType.Delebi ? 10 : 16;
             var codes = s.Current.KeyCodes;
             for (int i = 0; i < keyCount; i++)
-                h[i] = CheckKey(codes[handLoc[i]]);
+                _hBuffer[i] = CheckKey(codes[handLoc[i]]);
             if (s.Character != CharacterType.Delebi)
             {
                 for (int i = 0; i < 4; i++)
-                    f[i] = CheckKey(s.Current.FKeyCodes[LegLocation[i]]);
+                    _fBuffer[i] = CheckKey(s.Current.FKeyCodes[LegLocation[i]]);
             }
 
             if (s.Character == CharacterType.Line)
-                ApplyKeyStatesLine(h);
+                ApplyKeyStatesLine(_hBuffer);
             else if (s.Character == CharacterType.Delebi)
-                ApplyKeyStatesDelebi(h);
+                ApplyKeyStatesDelebi(_hBuffer);
             else
-                ApplyKeyStatesYoon(h, f);
+                ApplyKeyStatesYoon(_hBuffer, _fBuffer);
         }
 
         #region Yoon key state apply (main thread)
