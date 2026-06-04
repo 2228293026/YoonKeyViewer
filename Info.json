@@ -2,7 +2,7 @@
   "Id": "YoonKeyViewer",
   "DisplayName": "YoonKeyViewer",
   "Author": "Jongyeol & Jofo",
-  "Version": "1.1.1",
+  "Version": "1.1.2",
   "AssemblyName": "YoonKeyViewer.dll",
   "EntryMethod": "YoonKeyViewer.Main.Setup"
 }
