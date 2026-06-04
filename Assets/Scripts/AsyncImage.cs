@@ -13,6 +13,7 @@ namespace YoonKeyViewer.Component
             get => _sprite;
             set
             {
+                if (_sprite == value) return;
                 _sprite = value;
                 if (image != null) image.sprite = value;
             }

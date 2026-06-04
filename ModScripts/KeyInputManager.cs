@@ -91,8 +91,8 @@ namespace YoonKeyViewer
         private static readonly bool[] _prevFoot = new bool[4];
         private static readonly bool[] _hBuffer = new bool[16];
         private static readonly bool[] _fBuffer = new bool[4];
-        private static readonly List<int> _leftPressed = new();
-        private static readonly List<int> _rightPressed = new();
+        private static readonly List<int> _leftPressed = new(8);
+        private static readonly List<int> _rightPressed = new(8);
         private static int _mainCount;
 
         public static bool NeedsReset;
@@ -102,16 +102,18 @@ namespace YoonKeyViewer
         {
             if (Main.setting == null) return;
             var s = Main.setting;
+            var cfg = s.Current;
 
             int[] handLoc = s.Character == CharacterType.Delebi ? HandLocationDelebi : HandLocation;
             int keyCount = s.Character == CharacterType.Delebi ? 10 : 16;
-            var codes = s.Current.KeyCodes;
+            var codes = cfg.KeyCodes;
             for (int i = 0; i < keyCount; i++)
                 _hBuffer[i] = CheckKey(codes[handLoc[i]]);
             if (s.Character != CharacterType.Delebi)
             {
+                var fCodes = cfg.FKeyCodes;
                 for (int i = 0; i < 4; i++)
-                    _fBuffer[i] = CheckKey(s.Current.FKeyCodes[LegLocation[i]]);
+                    _fBuffer[i] = CheckKey(fCodes[LegLocation[i]]);
             }
 
             if (s.Character == CharacterType.Line)
@@ -128,6 +130,12 @@ namespace YoonKeyViewer
             var v = Main.KeyViewer;
             if (v == null) return;
             var s = Main.setting;
+
+            var cfg = s.Current;
+            bool flipH = cfg.FlipHorizontal;
+            bool hideDesk = cfg.HideDesk;
+            bool hideFeet = cfg.HideFeet;
+            bool hideFeetKb = cfg.HideFeetKeyboard;
 
             // ── Reset ──
             if (NeedsReset)
@@ -147,7 +155,7 @@ namespace YoonKeyViewer
             {
                 bool cur = h[i];
                 if (cur == _prevHand[i]) continue;
-                int num = s.Current.FlipHorizontal ? (i < 8 ? 7 : 23) - i : i;
+                int num = flipH ? (i < 8 ? 7 : 23) - i : i;
                 bool left = num < 4 || (num >= 8 && num < 12);
                 var key = v.keys[num];
                 if (key == null) continue;
@@ -175,7 +183,7 @@ namespace YoonKeyViewer
                     if (!v.isSmashing) continue;
                     v.YoonSmash.sprite = v.YoonSmash.image.sprite = YoonBundleManager.Instance.YoonSmash;
                     v.Yoon.enable = 1; v.leftHand.enable = 1; v.rightHand.enable = 1; v.YoonSmash.enable = 0;
-                    if (s.Current.HideDesk) { if (v.winkOn) { v.Table.enable = 0; v.winkOn = false; } }
+                    if (hideDesk) { if (v.winkOn) { v.Table.enable = 0; v.winkOn = false; } }
                     else { v.winkOn = false; }
                     v.isSmashing = false;
                 }
@@ -187,7 +195,7 @@ namespace YoonKeyViewer
             }
 
             // ── 脚键（Yoon only） ──
-            if (!s.Current.HideFeet && !s.Current.HideFeetKeyboard)
+            if (!hideFeet && !hideFeetKb)
             {
                 if (v.FeetKeyboard && v.FeetKeyboard.enable == 0) v.FeetKeyboard.enable = 1;
                 for (int i = 0; i < 4; i++)
@@ -213,6 +221,9 @@ namespace YoonKeyViewer
             var v = Main.KeyViewerLine;
             if (v == null) return;
             var s = Main.setting;
+            var cfg = s.Current;
+            bool flipH = cfg.FlipHorizontal;
+            bool hideDesk = cfg.HideDesk;
 
             if (NeedsReset)
             {
@@ -227,7 +238,7 @@ namespace YoonKeyViewer
             {
                 bool cur = h[i];
                 if (cur == _prevHand[i]) continue;
-                int num = s.Current.FlipHorizontal ? (i < 8 ? 7 : 23) - i : i;
+                int num = flipH ? (i < 8 ? 7 : 23) - i : i;
                 bool left = num >= 12 || (num >= 4 && num < 8);
                 var key = v.keys[num];
                 if (key == null) continue;
@@ -254,7 +265,7 @@ namespace YoonKeyViewer
                 {
                     if (!v.headOn) continue;
                     v.head.enable = 0; v.leftHand.enable = 1; v.rightHand.enable = 1;
-                    if (s.Current.HideDesk)
+                    if (hideDesk)
                     {
                         if (v.winkOn) { v.mainImage.sprite = LineBundleManager.Instance.Line; v.winkOn = false; }
                         v.mainImage.enable = 1;
@@ -265,7 +276,7 @@ namespace YoonKeyViewer
                 else if (!v.headOn)
                 {
                     v.head.enable = 1; v.leftHand.enable = 0; v.rightHand.enable = 0;
-                    if (s.Current.HideDesk) v.mainImage.enable = 0;
+                    if (hideDesk) v.mainImage.enable = 0;
                     else v.mainImage.sprite = LineBundleManager.Instance.Table;
                     v.headOn = true;
                 }
@@ -279,6 +290,7 @@ namespace YoonKeyViewer
             var v = Main.KeyViewerDelebi;
             if (v == null) return;
             var s = Main.setting;
+            bool flipH = s.Current.FlipHorizontal;
 
             if (NeedsReset)
             {
@@ -294,7 +306,7 @@ namespace YoonKeyViewer
             {
                 bool cur = h[i];
                 if (cur == _prevHand[i]) continue;
-                int num = s.Current.FlipHorizontal ? (i < 8 ? 7 : 9 - (i - 8)) : i;
+                int num = flipH ? (i < 8 ? 7 : 9 - (i - 8)) : i;
                 bool left = num < 4 || num == 8;
                 var key = v.keys[num];
                 if (key == null) continue;

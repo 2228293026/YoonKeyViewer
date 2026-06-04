@@ -53,6 +53,7 @@ namespace YoonKeyViewer
                     YoonBundleManager.Instance = new YoonBundleManager();
                     GameObject gameObject = UnityEngine.Object.Instantiate(YoonBundleManager.Instance.KeyViewerObject);
                     RemoveGraphicRaycaster(gameObject);
+                    DisableRaycastTargets(gameObject);
                     UnityEngine.Object.DontDestroyOnLoad(gameObject);
                     KeyViewer = gameObject.GetComponent<scrYoonKeyViewer>();
                     //KeyViewer = ViewerSetup.SetupYoon(gameObject);
@@ -65,6 +66,7 @@ namespace YoonKeyViewer
                     LineBundleManager.Instance = new LineBundleManager();
                     GameObject gameObject = UnityEngine.Object.Instantiate(LineBundleManager.Instance.KeyViewerObject);
                     RemoveGraphicRaycaster(gameObject);
+                    DisableRaycastTargets(gameObject);
                     UnityEngine.Object.DontDestroyOnLoad(gameObject);
                     KeyViewerLine = gameObject.GetComponent<scrLineKeyViewer>();
                     //KeyViewerLine = ViewerSetup.SetupLine(gameObject);
@@ -77,6 +79,7 @@ namespace YoonKeyViewer
                     DelebiBundleManager.Instance = new DelebiBundleManager();
                     GameObject gameObject = UnityEngine.Object.Instantiate(DelebiBundleManager.Instance.KeyViewerObject);
                     RemoveGraphicRaycaster(gameObject);
+                    DisableRaycastTargets(gameObject);
                     UnityEngine.Object.DontDestroyOnLoad(gameObject);
                     KeyViewerDelebi = gameObject.GetComponent<scrDelebiKeyViewer>();
                     KeyViewerDelebi.sizeTransform.localScale = new Vector3(setting.Current.Size, setting.Current.Size);
@@ -139,6 +142,7 @@ namespace YoonKeyViewer
                     YoonBundleManager.Instance = new YoonBundleManager();
                 GameObject go = UnityEngine.Object.Instantiate(YoonBundleManager.Instance.KeyViewerObject);
                 RemoveGraphicRaycaster(go);
+                DisableRaycastTargets(go);
                 UnityEngine.Object.DontDestroyOnLoad(go);
                 KeyViewer = go.GetComponent<scrYoonKeyViewer>();
                 //KeyViewer = ViewerSetup.SetupYoon(go);
@@ -150,6 +154,7 @@ namespace YoonKeyViewer
                     LineBundleManager.Instance = new LineBundleManager();
                 GameObject go = UnityEngine.Object.Instantiate(LineBundleManager.Instance.KeyViewerObject);
                 RemoveGraphicRaycaster(go);
+                DisableRaycastTargets(go);
                 UnityEngine.Object.DontDestroyOnLoad(go);
                 KeyViewerLine = go.GetComponent<scrLineKeyViewer>();
                 //KeyViewerLine = ViewerSetup.SetupLine(go);
@@ -163,6 +168,7 @@ namespace YoonKeyViewer
                     DelebiBundleManager.Instance = new DelebiBundleManager();
                 GameObject go = UnityEngine.Object.Instantiate(DelebiBundleManager.Instance.KeyViewerObject);
                 RemoveGraphicRaycaster(go);
+                DisableRaycastTargets(go);
                 UnityEngine.Object.DontDestroyOnLoad(go);
                 KeyViewerDelebi = go.GetComponent<scrDelebiKeyViewer>();
                 KeyViewerDelebi.sizeTransform.localScale = new Vector3(setting.Current.Size, setting.Current.Size);
@@ -650,6 +656,12 @@ namespace YoonKeyViewer
             var raycaster = go.GetComponent<UnityEngine.UI.GraphicRaycaster>();
             if (raycaster != null)
                 UnityEngine.Object.Destroy(raycaster);
+        }
+
+        private static void DisableRaycastTargets(GameObject go)
+        {
+            foreach (var img in go.GetComponentsInChildren<UnityEngine.UI.Image>(true))
+                img.raycastTarget = false;
         }
 
         private static void OnSaveGUI(UnityModManager.ModEntry modEntry)

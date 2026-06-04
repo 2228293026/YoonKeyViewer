@@ -13,6 +13,7 @@ namespace YoonKeyViewer.Component
             get => _enable;
             set
             {
+                if (_enable == value) return;
                 _enable = value;
                 if (image != null) image.enabled = value != 0;
             }
