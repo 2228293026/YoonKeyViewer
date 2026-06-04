@@ -55,9 +55,9 @@ namespace YoonKeyViewer
                     UnityEngine.Object.DontDestroyOnLoad(gameObject);
                     KeyViewer = gameObject.GetComponent<scrYoonKeyViewer>();
                     //KeyViewer = ViewerSetup.SetupYoon(gameObject);
-                    KeyViewer.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
-                    if (setting.FlipHorizontal) KeyViewer.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
-                    if (setting.HideDesk) KeyViewer.Table.enable = 0;
+                    KeyViewer.sizeTransform.localScale = new Vector3(setting.Current.Size, setting.Current.Size);
+                    if (setting.Current.FlipHorizontal) KeyViewer.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
+                    if (setting.Current.HideDesk) KeyViewer.Table.enable = 0;
                 }
                 else if (setting.Character == CharacterType.Line)
                 {
@@ -66,9 +66,9 @@ namespace YoonKeyViewer
                     UnityEngine.Object.DontDestroyOnLoad(gameObject);
                     KeyViewerLine = gameObject.GetComponent<scrLineKeyViewer>();
                     //KeyViewerLine = ViewerSetup.SetupLine(gameObject);
-                    KeyViewerLine.mainImage.sprite = setting.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
-                    KeyViewerLine.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
-                    if (setting.FlipHorizontal) KeyViewerLine.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
+                    KeyViewerLine.mainImage.sprite = setting.Current.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
+                    KeyViewerLine.sizeTransform.localScale = new Vector3(setting.Current.Size, setting.Current.Size);
+                    if (setting.Current.FlipHorizontal) KeyViewerLine.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
                 }
                 else
                 {
@@ -76,8 +76,8 @@ namespace YoonKeyViewer
                     GameObject gameObject = UnityEngine.Object.Instantiate(DelebiBundleManager.Instance.KeyViewerObject);
                     UnityEngine.Object.DontDestroyOnLoad(gameObject);
                     KeyViewerDelebi = gameObject.GetComponent<scrDelebiKeyViewer>();
-                    KeyViewerDelebi.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
-                    if (setting.FlipHorizontal) KeyViewerDelebi.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
+                    KeyViewerDelebi.sizeTransform.localScale = new Vector3(setting.Current.Size, setting.Current.Size);
+                    if (setting.Current.FlipHorizontal) KeyViewerDelebi.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
                 }
                 UpdateLocation();
                 PatchManager.ApplyAll();
@@ -138,7 +138,7 @@ namespace YoonKeyViewer
                 UnityEngine.Object.DontDestroyOnLoad(go);
                 KeyViewer = go.GetComponent<scrYoonKeyViewer>();
                 //KeyViewer = ViewerSetup.SetupYoon(go);
-                if (setting.HideDesk) KeyViewer.Table.enable = 0;
+                if (setting.Current.HideDesk) KeyViewer.Table.enable = 0;
             }
             else if (setting.Character == CharacterType.Line)
             {
@@ -148,7 +148,7 @@ namespace YoonKeyViewer
                 UnityEngine.Object.DontDestroyOnLoad(go);
                 KeyViewerLine = go.GetComponent<scrLineKeyViewer>();
                 //KeyViewerLine = ViewerSetup.SetupLine(go);
-                KeyViewerLine.mainImage.sprite = setting.HideDesk
+                KeyViewerLine.mainImage.sprite = setting.Current.HideDesk
                     ? LineBundleManager.Instance.Line
                     : LineBundleManager.Instance.LineTable;
             }
@@ -159,16 +159,16 @@ namespace YoonKeyViewer
                 GameObject go = UnityEngine.Object.Instantiate(DelebiBundleManager.Instance.KeyViewerObject);
                 UnityEngine.Object.DontDestroyOnLoad(go);
                 KeyViewerDelebi = go.GetComponent<scrDelebiKeyViewer>();
-                KeyViewerDelebi.sizeTransform.localScale = new Vector3(setting.Size, setting.Size);
-                if (setting.FlipHorizontal) KeyViewerDelebi.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
+                KeyViewerDelebi.sizeTransform.localScale = new Vector3(setting.Current.Size, setting.Current.Size);
+                if (setting.Current.FlipHorizontal) KeyViewerDelebi.sizeTransform.eulerAngles = new Vector3(0, 180, 0);
             }
 
             // Apply size & flip
-            var scale = new Vector3(setting.Size, setting.Size);
-            var angles = new Vector3(0, setting.FlipHorizontal ? 180 : 0, 0);
+            var scale = new Vector3(setting.Current.Size, setting.Current.Size);
+            var angles = new Vector3(0, setting.Current.FlipHorizontal ? 180 : 0, 0);
             if (KeyViewer) { KeyViewer.sizeTransform.localScale = scale; KeyViewer.sizeTransform.eulerAngles = angles; }
             if (KeyViewerLine) { KeyViewerLine.sizeTransform.localScale = scale;
-                KeyViewerLine.mainImage.sprite = setting.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable; KeyViewerLine.sizeTransform.eulerAngles = angles; }
+                KeyViewerLine.mainImage.sprite = setting.Current.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable; KeyViewerLine.sizeTransform.eulerAngles = angles; }
 
             UpdateLocation();
             KeyInputManager.NeedsReset = true;
@@ -189,43 +189,43 @@ namespace YoonKeyViewer
                 SwitchCharacter();
             }
 
-            float newSize = NamedSlider("Size:", setting.Size, 0, 2, 150);
-            if (newSize != setting.Size)
+            float newSize = NamedSlider("Size:", setting.Current.Size, 0, 2, 150);
+            if (newSize != setting.Current.Size)
             {
-                setting.Size = newSize;
-                var scale = new Vector3(setting.Size, setting.Size);
+                setting.Current.Size = newSize;
+                var scale = new Vector3(setting.Current.Size, setting.Current.Size);
                 if (KeyViewer?.sizeTransform) KeyViewer.sizeTransform.localScale = scale;
                 if (KeyViewerLine?.sizeTransform) KeyViewerLine.sizeTransform.localScale = scale;
                 if (KeyViewerDelebi?.sizeTransform) KeyViewerDelebi.sizeTransform.localScale = scale;
                 UpdateLocation();
             }
-            float newLocationX = NamedSlider($"{setting.GetLocalized("ykv.posx")}:", setting.LocationX, 0, 1, 250);
-            if (newLocationX != setting.LocationX)
+            float newLocationX = NamedSlider($"{setting.GetLocalized("ykv.posx")}:", setting.Current.LocationX, 0, 1, 250);
+            if (newLocationX != setting.Current.LocationX)
             {
-                setting.LocationX = newLocationX;
+                setting.Current.LocationX = newLocationX;
                 UpdateLocation();
             }
-            float newLocationY = NamedSlider($"{setting.GetLocalized("ykv.posy")}:", setting.LocationY, 0, 1, 250);
-            if (newLocationY != setting.LocationY)
+            float newLocationY = NamedSlider($"{setting.GetLocalized("ykv.posy")}:", setting.Current.LocationY, 0, 1, 250);
+            if (newLocationY != setting.Current.LocationY)
             {
-                setting.LocationY = newLocationY;
+                setting.Current.LocationY = newLocationY;
                 UpdateLocation();
             }
             // Nervous BPM (Yoon only)
             if (setting.Character == CharacterType.Yoon)
             {
-                float newNervousBPM = NamedSlider($"{setting.GetLocalized("ykv.nervousbpm")}:", setting.NervousBPM, 1, 1000, 250);
+                float newNervousBPM = NamedSlider($"{setting.GetLocalized("ykv.nervousbpm")}:", setting.Current.NervousBPM, 1, 1000, 250);
                 newNervousBPM = Mathf.Max(1, newNervousBPM);
-                if (newNervousBPM != setting.NervousBPM)
+                if (newNervousBPM != setting.Current.NervousBPM)
                 {
-                    setting.NervousBPM = newNervousBPM;
+                    setting.Current.NervousBPM = newNervousBPM;
                 }
             }
-            bool newFlipHorizontal = GUILayout.Toggle(setting.FlipHorizontal, $"{setting.GetLocalized("ykv.fliphorizontal")}:");
-            if (newFlipHorizontal != setting.FlipHorizontal)
+            bool newFlipHorizontal = GUILayout.Toggle(setting.Current.FlipHorizontal, $"{setting.GetLocalized("ykv.fliphorizontal")}:");
+            if (newFlipHorizontal != setting.Current.FlipHorizontal)
             {
-                setting.FlipHorizontal = newFlipHorizontal;
-                var angles = new Vector3(0, setting.FlipHorizontal ? 180 : 0, 0);
+                setting.Current.FlipHorizontal = newFlipHorizontal;
+                var angles = new Vector3(0, setting.Current.FlipHorizontal ? 180 : 0, 0);
                 if (KeyViewer?.sizeTransform) KeyViewer.sizeTransform.eulerAngles = angles;
                 if (KeyViewerLine?.sizeTransform) KeyViewerLine.sizeTransform.eulerAngles = angles;
                 if (KeyViewerDelebi?.sizeTransform) KeyViewerDelebi.sizeTransform.eulerAngles = angles;
@@ -233,38 +233,38 @@ namespace YoonKeyViewer
             }
             if (setting.Character != CharacterType.Delebi)
             {
-                bool newHideDesk = GUILayout.Toggle(setting.HideDesk, $"{setting.GetLocalized("ykv.hidedesk")}:");
-                if (newHideDesk != setting.HideDesk)
+                bool newHideDesk = GUILayout.Toggle(setting.Current.HideDesk, $"{setting.GetLocalized("ykv.hidedesk")}:");
+                if (newHideDesk != setting.Current.HideDesk)
                 {
-                    setting.HideDesk = newHideDesk;
-                    if (KeyViewer) KeyViewer.Table.enable = setting.HideDesk ? (sbyte)0 : (sbyte)1;
-                    if (KeyViewerLine) KeyViewerLine.mainImage.sprite = setting.HideDesk
+                    setting.Current.HideDesk = newHideDesk;
+                    if (KeyViewer) KeyViewer.Table.enable = setting.Current.HideDesk ? (sbyte)0 : (sbyte)1;
+                    if (KeyViewerLine) KeyViewerLine.mainImage.sprite = setting.Current.HideDesk
                         ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
                 }
             }
 
-            bool oldHideFeet = setting.HideFeet;
+            bool oldHideFeet = setting.Current.HideFeet;
             if (setting.Character == CharacterType.Yoon)
             {
-                bool newHideLegs = GUILayout.Toggle(setting.HideFeet, $"{setting.GetLocalized("ykv.hidelegs")}:");
-                if (newHideLegs != setting.HideFeet)
+                bool newHideLegs = GUILayout.Toggle(setting.Current.HideFeet, $"{setting.GetLocalized("ykv.hidelegs")}:");
+                if (newHideLegs != setting.Current.HideFeet)
                 {
-                    setting.HideFeet = newHideLegs;
+                    setting.Current.HideFeet = newHideLegs;
                     if (KeyViewer)
                     {
-                        KeyViewer.leftLeg.enable = setting.HideFeet ? (sbyte)0 : (sbyte)1;
-                        KeyViewer.rightLeg.enable = setting.HideFeet ? (sbyte)0 : (sbyte)1;
-                        KeyViewer.FeetKeyboard.enable = setting.HideFeet ? (sbyte)0 : setting.HideFeetKeyboard ? (sbyte)0 : (sbyte)1;
+                        KeyViewer.leftLeg.enable = setting.Current.HideFeet ? (sbyte)0 : (sbyte)1;
+                        KeyViewer.rightLeg.enable = setting.Current.HideFeet ? (sbyte)0 : (sbyte)1;
+                        KeyViewer.FeetKeyboard.enable = setting.Current.HideFeet ? (sbyte)0 : setting.Current.HideFeetKeyboard ? (sbyte)0 : (sbyte)1;
 
                     }
                     KeyInputManager.NeedsReset = true;
                 }
                 if (!oldHideFeet)
                 {
-                    bool newHideFeetKeyboard = GUILayout.Toggle(setting.HideFeetKeyboard, $"{setting.GetLocalized("ykv.hidefeetkeyboard")}");
-                    if (newHideFeetKeyboard != setting.HideFeetKeyboard)
+                    bool newHideFeetKeyboard = GUILayout.Toggle(setting.Current.HideFeetKeyboard, $"{setting.GetLocalized("ykv.hidefeetkeyboard")}");
+                    if (newHideFeetKeyboard != setting.Current.HideFeetKeyboard)
                     {
-                        setting.HideFeetKeyboard = newHideFeetKeyboard;
+                        setting.Current.HideFeetKeyboard = newHideFeetKeyboard;
                         if (KeyViewer) KeyViewer.FeetKeyboard.enable = newHideFeetKeyboard ? (sbyte)0 : (sbyte)1;
                         KeyInputManager.NeedsReset = true;
                     }
@@ -295,7 +295,7 @@ namespace YoonKeyViewer
             GUILayout.EndHorizontal();
 
             // Feet Keyboard (Yoon only)
-            if (setting.Character == CharacterType.Yoon && !oldHideFeet && !setting.HideFeetKeyboard)
+            if (setting.Character == CharacterType.Yoon && !oldHideFeet && !setting.Current.HideFeetKeyboard)
             {
                 GUILayout.Label(setting.GetLocalized("ykv.feetkeyboard"));
                 GUILayout.BeginHorizontal();
@@ -336,9 +336,7 @@ namespace YoonKeyViewer
 
         private static void CreateButton(int i)
         {
-            var codes = setting.Character == CharacterType.Yoon ? setting.YoonKeyCodes
-                : setting.Character == CharacterType.Line ? setting.LineKeyCodes
-                : setting.DelebiKeyCodes;
+            var codes = setting.Current.KeyCodes;
             if (!GUILayout.Button(Bold(KeyToString(codes[i]), i == SelectedKey))) return;
             SelectedKey = i;
             WinAPICool = 0;
@@ -347,7 +345,7 @@ namespace YoonKeyViewer
         }
         private static void CreateFootButton(int i)
         {
-            if (!GUILayout.Button(Bold(KeyToString(setting.FKeyCodes[i]), i + 100 == SelectedKey))) return;
+            if (!GUILayout.Button(Bold(KeyToString(setting.Current.FKeyCodes[i]), i + 100 == SelectedKey))) return;
             SelectedKey = i + 100; // Offset to distinguish from hand keys
             WinAPICool = 0;
             KeyPressed = new bool[256];
@@ -359,19 +357,19 @@ namespace YoonKeyViewer
         {
             if (SelectedKey >= 100)
             {
-                setting.FKeyCodes[SelectedKey - 100] = keyCode;
+                setting.Current.FKeyCodes[SelectedKey - 100] = keyCode;
             }
             else if (setting.Character == CharacterType.Delebi)
             {
-                setting.DelebiKeyCodes[SelectedKey] = keyCode;
+                setting.DelebiConfig.KeyCodes[SelectedKey] = keyCode;
             }
             else if (setting.Character == CharacterType.Line)
             {
-                setting.LineKeyCodes[SelectedKey] = keyCode;
+                setting.LineConfig.KeyCodes[SelectedKey] = keyCode;
             }
             else
             {
-                setting.YoonKeyCodes[SelectedKey] = keyCode;
+                setting.YoonConfig.KeyCodes[SelectedKey] = keyCode;
             }
 
             SelectedKey = -4;
@@ -420,7 +418,7 @@ namespace YoonKeyViewer
                         KeyViewer.Yoon.sprite = YoonBundleManager.Instance.YoonIdle;
                         KeyViewer.YoonSmash.enable = 0;
                         KeyViewer.YoonClear.enable = 0;
-                        KeyViewer.Table.enable = setting.HideDesk ? (sbyte)0 : (sbyte)1;
+                        KeyViewer.Table.enable = setting.Current.HideDesk ? (sbyte)0 : (sbyte)1;
                     }
                     _nextWinkTime = Time.time + UnityEngine.Random.Range(3f, 7f);
                 }
@@ -441,7 +439,7 @@ namespace YoonKeyViewer
                 KeyViewer.Yoon.sprite = YoonBundleManager.Instance.YoonIdleWink;
                 KeyViewer.YoonSmash.enable = 0;
                 KeyViewer.YoonClear.enable = 0;
-                KeyViewer.Table.enable = setting.HideDesk ? (sbyte)0 : (sbyte)1;
+                KeyViewer.Table.enable = setting.Current.HideDesk ? (sbyte)0 : (sbyte)1;
             }
         }
 
@@ -458,7 +456,7 @@ namespace YoonKeyViewer
                     if (lv.winkOn)
                     {
                         lv.winkOn = false;
-                        lv.mainImage.sprite = setting.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
+                        lv.mainImage.sprite = setting.Current.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
                     }
                     _nextWinkTime = Time.time + UnityEngine.Random.Range(3f, 7f);
                 }
@@ -476,7 +474,7 @@ namespace YoonKeyViewer
                 _winkInProgress = true;
                 _winkEndTime = Time.time + UnityEngine.Random.Range(0.1f, 0.25f);
                 lv.winkOn = true;
-                lv.mainImage.sprite = setting.HideDesk ? LineBundleManager.Instance.LineWink : LineBundleManager.Instance.LineWinkTable;
+                lv.mainImage.sprite = setting.Current.HideDesk ? LineBundleManager.Instance.LineWink : LineBundleManager.Instance.LineWinkTable;
                 lv.mainImage.enable = 1;
             }
         }
@@ -522,12 +520,12 @@ namespace YoonKeyViewer
 
         private static void UpdateLocation()
         {
-            float y = 1 - setting.LocationY;
+            float y = 1 - setting.Current.LocationY;
             RectTransform rectTransform = KeyViewer?.locationTransform ?? KeyViewerLine?.locationTransform ?? KeyViewerDelebi?.locationTransform;
             if (rectTransform == null) return;
-            rectTransform.sizeDelta = new Vector2(540 * setting.Size, 420 * setting.Size);
-            rectTransform.pivot = new Vector2(setting.LocationX, y);
-            rectTransform.anchoredPosition = new Vector2(setting.LocationX * 1920, y * 1080);
+            rectTransform.sizeDelta = new Vector2(540 * setting.Current.Size, 420 * setting.Current.Size);
+            rectTransform.pivot = new Vector2(setting.Current.LocationX, y);
+            rectTransform.anchoredPosition = new Vector2(setting.Current.LocationX * 1920, y * 1080);
         }
 
         public static float NamedSlider(string name, float value, float leftValue, float rightValue, float sliderWidth,

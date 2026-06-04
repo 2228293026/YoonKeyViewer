@@ -1,14 +1,57 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityModManagerNet;
 
 namespace YoonKeyViewer
 {
+    /// <summary>
+    /// Per-character configuration. Each character (Yoon/Line/Delebi) gets its own instance.
+    /// Yoon-specific fields (NervousBPM, HideFeet, HideFeetKeyboard, FKeyCodes) are included
+    /// here for simplicity; they are only read when Character == Yoon.
+    /// </summary>
+    public class PerCharacterConfig
+    {
+        public float Size = 1f;
+        public float LocationX = 0f;
+        public float LocationY = 1f;
+        public bool FlipHorizontal = false;
+        public bool HideDesk = false;
+
+        // Yoon-only fields
+        public float NervousBPM = 300f;
+        public bool HideFeet = false;
+        public bool HideFeetKeyboard = false;
+
+        public KeyCode[] KeyCodes;
+        public KeyCode[] FKeyCodes = { KeyCode.F2, KeyCode.F3, KeyCode.F7, KeyCode.F8 };
+    }
+
     public class Setting : UnityModManager.ModSettings
     {
+        public CharacterType Character = CharacterType.Yoon;
+        public PerCharacterConfig YoonConfig;
+        public PerCharacterConfig LineConfig;
+        public PerCharacterConfig DelebiConfig;
+
+        public bool ShareJipperResourcePack = true;
+
+        [JsonIgnore]
+        public bool KeyCodeJipperResourcePack = false;
+
+        /// <summary>Returns the config for the currently selected character.</summary>
+        [JsonIgnore]
+        public PerCharacterConfig Current => Character switch
+        {
+            CharacterType.Yoon => YoonConfig,
+            CharacterType.Line => LineConfig,
+            CharacterType.Delebi => DelebiConfig,
+            _ => YoonConfig,
+        };
+
         public readonly Dictionary<string, Dictionary<SystemLanguage, string>> Localization = new()
         {
             {
@@ -146,46 +189,43 @@ namespace YoonKeyViewer
                 }
             }
         };
-        public CharacterType Character = CharacterType.Yoon;
-        public float Size = 1;
-        public float LocationX = 0;
-        public float LocationY = 1;
-        public float NervousBPM = 300f;
-        public bool FlipHorizontal = false;
-        public bool HideDesk = false;
-        public bool HideFeet = false;
-        public bool HideFeetKeyboard = false;
-        public bool ShareJipperResourcePack = true;
 
-        [JsonIgnore]
-        public bool KeyCodeJipperResourcePack = false;
+        // ── Factory: default config per character ──
 
-        public KeyCode[] YoonKeyCodes = new KeyCode[]
+        private static PerCharacterConfig DefaultYoonConfig() => new()
         {
-            KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
-            KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.Semicolon,
-            KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V,
-            KeyCode.N, KeyCode.M, KeyCode.Comma, KeyCode.Period
+            KeyCodes = new KeyCode[]
+            {
+                KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
+                KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.Semicolon,
+                KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V,
+                KeyCode.N, KeyCode.M, KeyCode.Comma, KeyCode.Period
+            },
+            FKeyCodes = new KeyCode[]
+            {
+                KeyCode.F2, KeyCode.F3, KeyCode.F7, KeyCode.F8
+            },
         };
 
-        public KeyCode[] LineKeyCodes = new KeyCode[]
+        private static PerCharacterConfig DefaultLineConfig() => new()
         {
-            KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
-            KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.Semicolon,
-            KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V,
-            KeyCode.N, KeyCode.M, KeyCode.Comma, KeyCode.Period
+            KeyCodes = new KeyCode[]
+            {
+                KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
+                KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.Semicolon,
+                KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V,
+                KeyCode.N, KeyCode.M, KeyCode.Comma, KeyCode.Period
+            },
         };
 
-        public KeyCode[] FKeyCodes = new KeyCode[]
+        private static PerCharacterConfig DefaultDelebiConfig() => new()
         {
-            KeyCode.F2, KeyCode.F3, KeyCode.F7, KeyCode.F8
-        };
-
-        public KeyCode[] DelebiKeyCodes = new KeyCode[]
-        {
-            KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
-            KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.Semicolon,
-            KeyCode.Z, KeyCode.X
+            KeyCodes = new KeyCode[]
+            {
+                KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F,
+                KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.Semicolon,
+                KeyCode.Z, KeyCode.X
+            },
         };
 
         public string GetLocalized(string key)
@@ -228,42 +268,141 @@ namespace YoonKeyViewer
 
             if (!File.Exists(filepath))
             {
-                return new Setting();
+                var fresh = new Setting();
+                fresh.YoonConfig = DefaultYoonConfig();
+                fresh.LineConfig = DefaultLineConfig();
+                fresh.DelebiConfig = DefaultDelebiConfig();
+                return fresh;
             }
 
             try
             {
-                var settings = new JsonSerializerSettings
+                var json = File.ReadAllText(filepath);
+
+                // ── Migration: detect old flat-field format ──
+                var obj = JObject.Parse(json);
+                if (obj["YoonConfig"] == null || obj["YoonConfig"].Type == JTokenType.Null)
+                {
+                    return MigrateFromV1(json, filepath, modEntry);
+                }
+
+                var serializerSettings = new JsonSerializerSettings
                 {
                     Formatting = Formatting.Indented,
                     ObjectCreationHandling = ObjectCreationHandling.Replace
                 };
 
-                var json = File.ReadAllText(filepath);
-                var setting = JsonConvert.DeserializeObject<Setting>(json, settings) ?? new Setting();
+                var setting = JsonConvert.DeserializeObject<Setting>(json, serializerSettings) ?? new Setting();
+
+                // Ensure configs are never null
+                setting.YoonConfig ??= DefaultYoonConfig();
+                setting.LineConfig ??= DefaultLineConfig();
+                setting.DelebiConfig ??= DefaultDelebiConfig();
+
+                // Ensure KeyCodes arrays are never null
+                if (setting.YoonConfig.KeyCodes == null || setting.YoonConfig.KeyCodes.Length == 0)
+                    setting.YoonConfig.KeyCodes = DefaultYoonConfig().KeyCodes;
+                if (setting.LineConfig.KeyCodes == null || setting.LineConfig.KeyCodes.Length == 0)
+                    setting.LineConfig.KeyCodes = DefaultLineConfig().KeyCodes;
+                if (setting.DelebiConfig.KeyCodes == null || setting.DelebiConfig.KeyCodes.Length == 0)
+                    setting.DelebiConfig.KeyCodes = DefaultDelebiConfig().KeyCodes;
+                if (setting.YoonConfig.FKeyCodes == null || setting.YoonConfig.FKeyCodes.Length == 0)
+                    setting.YoonConfig.FKeyCodes = DefaultYoonConfig().FKeyCodes;
 
                 return setting;
             }
             catch (Exception e)
             {
-                Main.Logger?.Log($"[Setting.Load] Failed to load settings: {e}");
-                return new Setting();
+                Main.Logger?.Log($"[Setting.Load] Failed to load settings: {e.Message}");
+                var fallback = new Setting();
+                fallback.YoonConfig = DefaultYoonConfig();
+                fallback.LineConfig = DefaultLineConfig();
+                fallback.DelebiConfig = DefaultDelebiConfig();
+                return fallback;
             }
         }
-        //public void ShareJipperKeyCode(bool enable)
-        //{
-        //    if (enable)
-        //    {
-        //        KeyCodes = JipperResourcePackAPI.GetKey16(); // External call
-        //        KeyCodeJipperResourcePack = true;
-        //    }
-        //    else
-        //    {
-        //        var keyCodes = new KeyCode[16];
-        //        Array.Copy(KeyCodes, keyCodes, 16);
-        //        KeyCodes = keyCodes;
-        //        KeyCodeJipperResourcePack = false;
-        //    }
-        //}
+
+        /// <summary>Migrate from v1 flat-field format to v2 per-character format.</summary>
+        private static Setting MigrateFromV1(string json, string filepath, UnityModManager.ModEntry modEntry)
+        {
+            Main.Logger?.Log("[Setting.Load] Detected v1 config format — migrating to v2 per-character format.");
+
+            try
+            {
+                var old = JsonConvert.DeserializeObject<SettingV1>(json);
+                if (old == null) throw new Exception("Failed to deserialize v1 config");
+
+                var setting = new Setting();
+                setting.Character = old.Character;
+
+                // Yoon gets the old flat values (most likely what the user was using)
+                setting.YoonConfig = new PerCharacterConfig
+                {
+                    Size = old.Size,
+                    LocationX = old.LocationX,
+                    LocationY = old.LocationY,
+                    FlipHorizontal = old.FlipHorizontal,
+                    HideDesk = old.HideDesk,
+                    HideFeet = old.HideFeet,
+                    HideFeetKeyboard = old.HideFeetKeyboard,
+                    NervousBPM = old.NervousBPM,
+                    KeyCodes = old.YoonKeyCodes ?? DefaultYoonConfig().KeyCodes,
+                    FKeyCodes = old.FKeyCodes ?? DefaultYoonConfig().FKeyCodes,
+                };
+
+                setting.LineConfig = new PerCharacterConfig
+                {
+                    KeyCodes = old.LineKeyCodes ?? DefaultLineConfig().KeyCodes,
+                };
+
+                setting.DelebiConfig = new PerCharacterConfig
+                {
+                    KeyCodes = old.DelebiKeyCodes ?? DefaultDelebiConfig().KeyCodes,
+                };
+
+                setting.ShareJipperResourcePack = old.ShareJipperResourcePack;
+
+                // Write new format immediately
+                var serializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented };
+                var newJson = JsonConvert.SerializeObject(setting, serializerSettings);
+                File.WriteAllText(filepath, newJson);
+                Main.Logger?.Log("[Setting.Load] Migration complete — config saved in v2 format.");
+
+                return setting;
+            }
+            catch (Exception ex)
+            {
+                Main.Logger?.Log($"[Setting.Load] Migration failed: {ex.Message}");
+                var fallback = new Setting();
+                fallback.YoonConfig = DefaultYoonConfig();
+                fallback.LineConfig = DefaultLineConfig();
+                fallback.DelebiConfig = DefaultDelebiConfig();
+                return fallback;
+            }
+        }
+
+        /// <summary>
+        /// v1 flat-field schema — only used for JSON deserialization during migration.
+        /// </summary>
+#pragma warning disable CS0649
+        private class SettingV1
+        {
+            public CharacterType Character = CharacterType.Yoon;
+            public float Size = 1f;
+            public float LocationX = 0f;
+            public float LocationY = 1f;
+            public float NervousBPM = 300f;
+            public bool FlipHorizontal = false;
+            public bool HideDesk = false;
+            public bool HideFeet = false;
+            public bool HideFeetKeyboard = false;
+            public bool ShareJipperResourcePack = true;
+
+            public KeyCode[] YoonKeyCodes;
+            public KeyCode[] LineKeyCodes;
+            public KeyCode[] DelebiKeyCodes;
+            public KeyCode[] FKeyCodes;
+        }
+#pragma warning restore CS0649
     }
 }

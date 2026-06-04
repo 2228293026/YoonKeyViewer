@@ -105,15 +105,13 @@ namespace YoonKeyViewer
 
             int[] handLoc = s.Character == CharacterType.Delebi ? HandLocationDelebi : HandLocation;
             int keyCount = s.Character == CharacterType.Delebi ? 10 : 16;
-            var codes = s.Character == CharacterType.Yoon ? s.YoonKeyCodes
-                : s.Character == CharacterType.Line ? s.LineKeyCodes
-                : s.DelebiKeyCodes;
+            var codes = s.Current.KeyCodes;
             for (int i = 0; i < keyCount; i++)
                 h[i] = CheckKey(codes[handLoc[i]]);
             if (s.Character != CharacterType.Delebi)
             {
                 for (int i = 0; i < 4; i++)
-                    f[i] = CheckKey(s.FKeyCodes[LegLocation[i]]);
+                    f[i] = CheckKey(s.Current.FKeyCodes[LegLocation[i]]);
             }
 
             if (s.Character == CharacterType.Line)
@@ -149,7 +147,7 @@ namespace YoonKeyViewer
             {
                 bool cur = h[i];
                 if (cur == _prevHand[i]) continue;
-                int num = s.FlipHorizontal ? (i < 8 ? 7 : 23) - i : i;
+                int num = s.Current.FlipHorizontal ? (i < 8 ? 7 : 23) - i : i;
                 bool left = num < 4 || (num >= 8 && num < 12);
                 var key = v.keys[num];
                 if (key == null) continue;
@@ -177,7 +175,7 @@ namespace YoonKeyViewer
                     if (!v.isSmashing) continue;
                     v.YoonSmash.sprite = v.YoonSmash.image.sprite = YoonBundleManager.Instance.YoonSmash;
                     v.Yoon.enable = 1; v.leftHand.enable = 1; v.rightHand.enable = 1; v.YoonSmash.enable = 0;
-                    if (s.HideDesk) { if (v.winkOn) { v.Table.enable = 0; v.winkOn = false; } }
+                    if (s.Current.HideDesk) { if (v.winkOn) { v.Table.enable = 0; v.winkOn = false; } }
                     else { v.winkOn = false; }
                     v.isSmashing = false;
                 }
@@ -189,7 +187,7 @@ namespace YoonKeyViewer
             }
 
             // ── 脚键（Yoon only） ──
-            if (!s.HideFeet && !s.HideFeetKeyboard)
+            if (!s.Current.HideFeet && !s.Current.HideFeetKeyboard)
             {
                 if (v.FeetKeyboard && v.FeetKeyboard.enable == 0) v.FeetKeyboard.enable = 1;
                 for (int i = 0; i < 4; i++)
@@ -229,7 +227,7 @@ namespace YoonKeyViewer
             {
                 bool cur = h[i];
                 if (cur == _prevHand[i]) continue;
-                int num = s.FlipHorizontal ? (i < 8 ? 7 : 23) - i : i;
+                int num = s.Current.FlipHorizontal ? (i < 8 ? 7 : 23) - i : i;
                 bool left = num >= 12 || (num >= 4 && num < 8);
                 var key = v.keys[num];
                 if (key == null) continue;
@@ -256,7 +254,7 @@ namespace YoonKeyViewer
                 {
                     if (!v.headOn) continue;
                     v.head.enable = 0; v.leftHand.enable = 1; v.rightHand.enable = 1;
-                    if (s.HideDesk)
+                    if (s.Current.HideDesk)
                     {
                         if (v.winkOn) { v.mainImage.sprite = LineBundleManager.Instance.Line; v.winkOn = false; }
                         v.mainImage.enable = 1;
@@ -267,7 +265,7 @@ namespace YoonKeyViewer
                 else if (!v.headOn)
                 {
                     v.head.enable = 1; v.leftHand.enable = 0; v.rightHand.enable = 0;
-                    if (s.HideDesk) v.mainImage.enable = 0;
+                    if (s.Current.HideDesk) v.mainImage.enable = 0;
                     else v.mainImage.sprite = LineBundleManager.Instance.Table;
                     v.headOn = true;
                 }
@@ -296,7 +294,7 @@ namespace YoonKeyViewer
             {
                 bool cur = h[i];
                 if (cur == _prevHand[i]) continue;
-                int num = s.FlipHorizontal ? (i < 8 ? 7 : 9 - (i - 8)) : i;
+                int num = s.Current.FlipHorizontal ? (i < 8 ? 7 : 9 - (i - 8)) : i;
                 bool left = num < 4 || num == 8;
                 var key = v.keys[num];
                 if (key == null) continue;
@@ -347,11 +345,11 @@ namespace YoonKeyViewer
             v.gameResult = true; v.isSmashing = false; v.winkOn = false;
             v.YoonClear.sprite = v.YoonClear.image.sprite = YoonBundleManager.Instance.YoonDie;
             v.YoonClear.enable = 1; v.Yoon.enable = 0;
-            v.Table.enable = Main.setting.HideDesk ? (sbyte)0 : (sbyte)1;
+            v.Table.enable = Main.setting.Current.HideDesk ? (sbyte)0 : (sbyte)1;
             v.leftHand.enable = 1; v.rightHand.enable = 1;
-            v.leftLeg.enable = Main.setting.HideFeet ? (sbyte)0 : (sbyte)1;
-            v.rightLeg.enable = Main.setting.HideFeet ? (sbyte)0 : (sbyte)1;
-            v.FeetKeyboard.enable = Main.setting.HideFeet ? (sbyte)0 : Main.setting.HideFeetKeyboard ? (sbyte)0 : (sbyte)1;
+            v.leftLeg.enable = Main.setting.Current.HideFeet ? (sbyte)0 : (sbyte)1;
+            v.rightLeg.enable = Main.setting.Current.HideFeet ? (sbyte)0 : (sbyte)1;
+            v.FeetKeyboard.enable = Main.setting.Current.HideFeet ? (sbyte)0 : Main.setting.Current.HideFeetKeyboard ? (sbyte)0 : (sbyte)1;
             v.YoonSmash.enable = 0;
         }
 
@@ -359,27 +357,27 @@ namespace YoonKeyViewer
         {
             var v = Main.KeyViewer; if (v == null || v.gameResult) return;
             v.gameResult = true; v.isSmashing = false; v.winkOn = false;
-            v.Table.enable = Main.setting.HideDesk ? (sbyte)0 : (sbyte)1;
+            v.Table.enable = Main.setting.Current.HideDesk ? (sbyte)0 : (sbyte)1;
             v.Yoon.enable = 0; v.leftHand.enable = 0; v.rightHand.enable = 0;
             v.leftLeg.enable = 0; v.rightLeg.enable = 0;
             v.YoonSmash.enable = 0;
             v.YoonClear.sprite = v.YoonClear.image.sprite
-                = Main.setting.HideFeet ? YoonBundleManager.Instance.YoonClearNoLeg : YoonBundleManager.Instance.YoonClear;
-            v.FeetKeyboard.enable = Main.setting.HideFeet ? (sbyte)0 : Main.setting.HideFeetKeyboard ? (sbyte)0 : (sbyte)1;
+                = Main.setting.Current.HideFeet ? YoonBundleManager.Instance.YoonClearNoLeg : YoonBundleManager.Instance.YoonClear;
+            v.FeetKeyboard.enable = Main.setting.Current.HideFeet ? (sbyte)0 : Main.setting.Current.HideFeetKeyboard ? (sbyte)0 : (sbyte)1;
             v.YoonClear.enable = 1;
         }
 
         public static void ResetPatchYoon()
         {
             var v = Main.KeyViewer; if (v == null) return;
-            v.Table.enable = Main.setting.HideDesk ? (sbyte)0 : (sbyte)1;
+            v.Table.enable = Main.setting.Current.HideDesk ? (sbyte)0 : (sbyte)1;
             if (!v.gameResult)
                 v.Yoon.sprite = v.Yoon.image.sprite = v.isNervous
                     ? YoonBundleManager.Instance.YoonNervous : YoonBundleManager.Instance.YoonIdle;
             v.Yoon.enable = 1; v.leftHand.enable = 1; v.rightHand.enable = 1;
-            v.leftLeg.enable = Main.setting.HideFeet ? (sbyte)0 : (sbyte)1;
-            v.rightLeg.enable = Main.setting.HideFeet ? (sbyte)0 : (sbyte)1;
-            v.FeetKeyboard.enable = Main.setting.HideFeet ? (sbyte)0 : Main.setting.HideFeetKeyboard ? (sbyte)0 : (sbyte)1;
+            v.leftLeg.enable = Main.setting.Current.HideFeet ? (sbyte)0 : (sbyte)1;
+            v.rightLeg.enable = Main.setting.Current.HideFeet ? (sbyte)0 : (sbyte)1;
+            v.FeetKeyboard.enable = Main.setting.Current.HideFeet ? (sbyte)0 : Main.setting.Current.HideFeetKeyboard ? (sbyte)0 : (sbyte)1;
             if (v.YoonClear.image.enabled && v.gameResult) { v.Yoon.enable = 0; v.YoonClear.enable = 1; }
             else { v.YoonClear.enable = 0; }
             if (v.YoonSmash.image.enabled && v.isSmashing)
@@ -397,7 +395,7 @@ namespace YoonKeyViewer
             v.gameResult = true; bool head = v.headOn; v.headOn = false; v.winkOn = false;
             v.head.sprite = LineBundleManager.Instance.LineDie;
             if (head) return;
-            if (Main.setting.HideDesk) v.mainImage.enable = 0; else v.mainImage.sprite = LineBundleManager.Instance.Table;
+            if (Main.setting.Current.HideDesk) v.mainImage.enable = 0; else v.mainImage.sprite = LineBundleManager.Instance.Table;
             v.leftHand.enable = 0; v.rightHand.enable = 0; v.head.enable = 1;
         }
 
@@ -405,7 +403,7 @@ namespace YoonKeyViewer
         {
             var v = Main.KeyViewerLine; if (v == null || v.gameResult) return;
             v.gameResult = true; bool head = v.headOn; v.headOn = false; v.winkOn = false;
-            v.mainImage.sprite = Main.setting.HideDesk ? LineBundleManager.Instance.LineClear : LineBundleManager.Instance.LineClearTable;
+            v.mainImage.sprite = Main.setting.Current.HideDesk ? LineBundleManager.Instance.LineClear : LineBundleManager.Instance.LineClearTable;
             if (head) { v.mainImage.enable = 1; v.head.enable = 0; }
             else { v.leftHand.enable = 0; v.rightHand.enable = 0; }
         }
@@ -415,7 +413,7 @@ namespace YoonKeyViewer
             var v = Main.KeyViewerLine; if (v == null) return;
             v.headOn = false; v.gameResult = false; v.head.enable = 0;
             v.leftHand.enable = 1; v.rightHand.enable = 1;
-            v.mainImage.sprite = Main.setting.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
+            v.mainImage.sprite = Main.setting.Current.HideDesk ? LineBundleManager.Instance.Line : LineBundleManager.Instance.LineTable;
             v.mainImage.enable = 1;
         }
 

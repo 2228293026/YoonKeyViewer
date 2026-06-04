@@ -119,7 +119,7 @@ namespace YoonKeyViewer
             float pitch = VersionSafe.GetPitch();
             double bpm = VersionSafe.GetBpm() * pitch;
 
-            bool nervous = (bpm * speed) >= Main.setting.NervousBPM;
+            bool nervous = (bpm * speed) >= Main.setting.Current.NervousBPM;
             Main.KeyViewer.isNervous = nervous;
 
             Main.KeyViewer.Yoon.sprite = Main.KeyViewer.Yoon.image.sprite =
