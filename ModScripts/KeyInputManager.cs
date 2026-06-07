@@ -21,65 +21,75 @@ namespace YoonKeyViewer
             int c = (int)keyCode;
             if (c >= 48 && c <= 57) return c;
             if (c >= 97 && c <= 122) return c - 32;
-            if (c >= 276 && c <= 279) return c - 239;
-            if (c >= 282 && c <= 293) return c - 170;
             if (c == 8 || c == 9 || c == 12 || c == 13 || c == 19) return c;
             if (c == 27 || c == 32) return c;
-            switch (keyCode)
+            return keyCode switch
             {
-                case KeyCode.Comma: return 188;
-                case KeyCode.Period: return 190;
-                case KeyCode.Semicolon: return 186;
-                case KeyCode.Slash: return 191;
-                case KeyCode.BackQuote: return 192;
-                case KeyCode.LeftBracket: return 219;
-                case KeyCode.Backslash: return 220;
-                case KeyCode.RightBracket: return 221;
-                case KeyCode.Quote: return 222;
-                case KeyCode.Minus: return 189;
-                case KeyCode.Equals: return 187;
-                case KeyCode.LeftShift: return 160;
-                case KeyCode.RightShift: return 161;
-                case KeyCode.LeftControl: return 162;
-                case KeyCode.RightControl: return 163;
-                case KeyCode.LeftAlt: return 164;
-                case KeyCode.RightAlt: return 165;
-                case KeyCode.Delete: return 46;   // VK_DELETE
-                case KeyCode.Insert: return 45;   // VK_INSERT
-                case KeyCode.Home: return 36;   // VK_HOME
-                case KeyCode.End: return 35;   // VK_END
-                case KeyCode.PageUp: return 33;   // VK_PRIOR
-                case KeyCode.PageDown: return 34;   // VK_NEXT
-                case KeyCode.CapsLock: return 20;   // VK_CAPITAL
-                case KeyCode.Numlock: return 144;  // VK_NUMLOCK
-                case KeyCode.ScrollLock: return 145; // VK_SCROLL
-                case KeyCode.Print: return 44;   // VK_SNAPSHOT (PrintScreen)
-                case KeyCode.Pause: return 19;   // VK_PAUSE
-                case KeyCode.Tab: return 9;    // VK_TAB
-                case KeyCode.Space: return 32;   // VK_SPACE
-                case KeyCode.Return: return 13;   // VK_RETURN
-                case KeyCode.Escape: return 27;   // VK_ESCAPE
-                case KeyCode.Keypad0: return 96;   // VK_NUMPAD0
-                case KeyCode.Keypad1: return 97;
-                case KeyCode.Keypad2: return 98;
-                case KeyCode.Keypad3: return 99;
-                case KeyCode.Keypad4: return 100;
-                case KeyCode.Keypad5: return 101;
-                case KeyCode.Keypad6: return 102;
-                case KeyCode.Keypad7: return 103;
-                case KeyCode.Keypad8: return 104;
-                case KeyCode.Keypad9: return 105;
-                case KeyCode.KeypadDivide: return 111; // VK_DIVIDE
-                case KeyCode.KeypadMultiply: return 106; // VK_MULTIPLY
-                case KeyCode.KeypadMinus: return 109; // VK_SUBTRACT
-                case KeyCode.KeypadPlus: return 107; // VK_ADD
-                case KeyCode.KeypadPeriod: return 110; // VK_DECIMAL
-                case KeyCode.KeypadEnter: return 13;  // VK_RETURN
-                case KeyCode.LeftWindows: return 91;   // VK_LWIN
-                case KeyCode.RightWindows: return 92;  // VK_RWIN
-                case KeyCode.Menu: return 93;           // VK_APPS (Application/Menu key)
-            }
-            return (int)keyCode;
+                KeyCode.Comma => 188,
+                KeyCode.Period => 190,
+                KeyCode.Semicolon => 186,
+                KeyCode.Slash => 191,
+                KeyCode.BackQuote => 192,
+                KeyCode.LeftBracket => 219,
+                KeyCode.Backslash => 220,
+                KeyCode.RightBracket => 221,
+                KeyCode.Quote => 222,
+                KeyCode.Minus => 189,
+                KeyCode.Equals => 187,
+                KeyCode.LeftShift => 160,
+                KeyCode.RightShift => 161,
+                KeyCode.LeftControl => 162,
+                KeyCode.RightControl => 163,
+                KeyCode.LeftAlt => 164,
+                KeyCode.RightAlt => 165,
+                KeyCode.Delete => 46,// VK_DELETE
+                KeyCode.Insert => 45,// VK_INSERT
+                KeyCode.Home => 36,// VK_HOME
+                KeyCode.End => 35,// VK_END
+                KeyCode.PageUp => 33,// VK_PRIOR
+                KeyCode.PageDown => 34,// VK_NEXT
+                KeyCode.CapsLock => 20,// VK_CAPITAL
+                KeyCode.Numlock => 144,// VK_NUMLOCK
+                KeyCode.ScrollLock => 145,// VK_SCROLL
+                KeyCode.Print => 44,// VK_SNAPSHOT (PrintScreen)
+                KeyCode.Pause => 19,// VK_PAUSE
+                KeyCode.Tab => 9,// VK_TAB
+                KeyCode.Space => 32,// VK_SPACE
+                KeyCode.Return => 13,// VK_RETURN
+                KeyCode.Escape => 27,// VK_ESCAPE
+                KeyCode.Keypad0 => 96,// VK_NUMPAD0
+                KeyCode.Keypad1 => 97,
+                KeyCode.Keypad2 => 98,
+                KeyCode.Keypad3 => 99,
+                KeyCode.Keypad4 => 100,
+                KeyCode.Keypad5 => 101,
+                KeyCode.Keypad6 => 102,
+                KeyCode.Keypad7 => 103,
+                KeyCode.Keypad8 => 104,
+                KeyCode.Keypad9 => 105,
+                KeyCode.KeypadDivide => 111,// VK_DIVIDE
+                KeyCode.KeypadMultiply => 106,// VK_MULTIPLY
+                KeyCode.KeypadMinus => 109,// VK_SUBTRACT
+                KeyCode.KeypadPlus => 107,// VK_ADD
+                KeyCode.KeypadPeriod => 110,// VK_DECIMAL
+                KeyCode.KeypadEnter => 13,// VK_RETURN
+                KeyCode.LeftWindows => 91,// VK_LWIN
+                KeyCode.RightWindows => 92,// VK_RWIN
+                KeyCode.Menu => 93,// VK_APPS (Application/Menu key)
+                KeyCode.F1 => 112,
+                KeyCode.F2 => 113,
+                KeyCode.F3 => 114,
+                KeyCode.F4 => 115,
+                KeyCode.F5 => 116,
+                KeyCode.F6 => 117,
+                KeyCode.F7 => 118,
+                KeyCode.F8 => 119,
+                KeyCode.F9 => 120,
+                KeyCode.F10 => 121,
+                KeyCode.F11 => 122,
+                KeyCode.F12 => 123,
+                _ => (int)keyCode,// 未知键返回原始值
+            };
         }
 
         private static bool CheckKey(KeyCode keyCode) => (int)keyCode >= 0x1000
